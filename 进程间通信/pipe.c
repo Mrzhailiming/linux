@@ -1,6 +1,6 @@
 #include <unistd.h>
 #include <stdio.h>
-
+//管道
 
 int main(){
   int fd[2];
