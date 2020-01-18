@@ -6,8 +6,6 @@ int main(){
   int fd[2];
   int ret = pipe(fd);
   if(ret == -1){
-  
-  //写
     return 0;
   }
   ret = fork();
