@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 //管道
-
+//wangjiaxushizhu
 int main(){
   int fd[2];
   int ret = pipe(fd);
