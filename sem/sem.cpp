@@ -30,8 +30,8 @@ class Model{
       sem_wait(&_mu_sem);
       *out = _v[_rpos];
       _rpos = (_rpos + 1) % COUNT;
-      sem_post(&_pro_sem);//给生产者资源计数器+1
       sem_post(&_mu_sem);
+      sem_post(&_pro_sem);//给生产者资源计数器+1
     }
     //生产者
     void Push(T& val){
@@ -41,8 +41,8 @@ class Model{
       sem_wait(&_mu_sem);
       _v[_wpos] = val;
       _wpos = (_wpos + 1) % COUNT;
-      sem_post(&_con_sem);//给消费者资源计数器+1
       sem_post(&_mu_sem);
+      sem_post(&_con_sem);//给消费者资源计数器+1
     }
   private:
     //三个信号量
@@ -59,6 +59,7 @@ void* conStart(void* arg){
   while(1){
     m->Pop(&out);
     printf("con [%p][%d]\n", pthread_self(), out);
+    sleep(1);
   }
   return NULL;
 }
@@ -69,6 +70,7 @@ void* proStart(void* arg){
     m->Push(out);
     printf("pro [%p][%d]\n", pthread_self(), out);
     ++out;
+    sleep(1);
   }
   return NULL;
 }
