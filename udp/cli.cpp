@@ -9,12 +9,11 @@ int main(){
   while(1){
     std::string send;
     std::cout << "cli:";
+    fflush(stdout);
     std::cin >> send;
     u.Send(send, destip, destport);
     u.Receive(send, destip, destport);
-
     std::cout << "ser:" << send.c_str() << std::endl;
-
   }
   u.Close();
   return 0;
