@@ -6,36 +6,71 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <pthread.h>
-
 #include <map>
 #include <set>
-#define THREAD_NUM 4
-#define RECV_BUF_SIZE 1024
-#include "msgPool.hpp"
 
+#include "msgPool.hpp"
+#include "request.hpp"
+#include "userManager.hpp"
+
+#define UDP_PORT 1999
+#define TCP_PORT 1997
+#define THREAD_NUM 4
+#define RECV_BUF_SIZE 1024 * 10
 
 class Server{
   public:
     Server(){
       _sockfd = -1;
+      _tcpSocket = -1;
       _messagePool = NULL;
+      _userMng = NULL;
     }
-    void initServer(std::string& ip, uint16_t port = 1999){
-      //创建套接字
+    ~Server(){
+      if(_messagePool){
+        delete _messagePool;
+      }
+      if(_userMng){
+        delete _userMng;
+      }
+    }
+    void initServer(){
+      //创建收发数据套接字
       _sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
       if(_sockfd < 0){
-        perror("create socket error");
+        perror("create udpsocket error");
         exit(1);
       }
       //绑定地址信息
       sockaddr_in addr;
       addr.sin_family = AF_INET;
-      addr.sin_port = htons(port);
-      addr.sin_addr.s_addr = inet_addr(ip.c_str());
+      addr.sin_port = htons(UDP_PORT);
+      addr.sin_addr.s_addr = inet_addr("0.0.0.0");
       int ret = bind(_sockfd, (struct sockaddr*)&addr, sizeof(addr));
       if(ret < 0){
-        perror("bind error");
+        perror("udp bind error");
         exit(2);
+      }
+      //创建注册登录退出套接字
+      _tcpSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+      if(_tcpSocket < 0){
+        perror("create tcpsocket error");
+        exit(1);
+      }
+      //绑定地址信息
+      sockaddr_in tcp_addr;
+      tcp_addr.sin_family = AF_INET;
+      tcp_addr.sin_port = htons(TCP_PORT);
+      tcp_addr.sin_addr.s_addr = inet_addr("0.0.0.0");
+      ret = bind(_tcpSocket, (struct sockaddr*)&tcp_addr, sizeof(tcp_addr));
+      if(ret < 0){
+        perror("udp bind error");
+        exit(2);
+      }
+      ret = listen(_tcpSocket, 5);
+      if(ret < 0){
+        perror("listen falied");
+        exit(3);
       }
       //创建数据池
       _messagePool = new msgPool;
@@ -43,10 +78,16 @@ class Server{
         perror("_messagePool create error");
         exit(3);
       }
+      //创建用户管理
+      _userMng = new userMaganer();
+      if(_userMng == NULL){
+        perror("userMaganer create failed");
+        exit(4);
+      }
     }
-    //创建线程收发数据
+    //创建线程
     void start(){
-      //创建线程
+      //创建收发数据线程
       for(int i = 0; i < THREAD_NUM; ++i){
         int ret = pthread_create(&th, NULL, pushStart, (void*)this);
         if(ret < 0){
@@ -54,7 +95,126 @@ class Server{
         }
         ret = pthread_create(&th, NULL, popStart, (void*)this);
       }
+      //创建请求处理线程, 调用accept获取连接
+      while(1){
+        sockaddr_in addr;
+        socklen_t len = sizeof(addr);
+
+        int newTcpSockfd = accept(_tcpSocket, (struct sockaddr*)&addr, &len);
+        printf("tcp soket success\n");
+        if(newTcpSockfd < 0){
+          perror("tcp accept failed");
+          continue;
+        }
+        connetInfo* conInfo = new connetInfo(newTcpSockfd, (void*)this);
+        int ret = pthread_create(&th, NULL, requestStart, (void*)conInfo);
+        if(ret < 0){
+          perror("tcp thread create failed");
+          continue;
+        }
+        printf("requestStart thread create success %d\n", __LINE__);
+      }
     }
+  private:
+    
+    //处理请求入口函数
+    static void* requestStart(void* arg){
+      connetInfo* conInfo = (connetInfo*)arg;
+      int tcpSock = conInfo->getTcpSock();
+      Server* server = (Server*)conInfo->getServer();
+      char flag;
+      printf("requestStart 进入线程接收标志位\n");
+      int ret = recv(tcpSock, &flag, 1, 0);
+      if(ret < 0){
+        perror("recv failed");
+        return NULL;
+      }
+      else if(ret == 0){
+        perror("peer closed");
+        return NULL;
+      }
+      uint64_t userId = -1;
+      int userStat = -1;
+
+      printf("收到了标志位:%c\n", flag);
+      int ch = flag - '0';
+      std::cout << "转换为int" << ch << std::endl;
+      switch(ch){
+        case LOGIN:
+          userStat = server->login(tcpSock);
+          break;
+        case LOGOUT:
+          userStat = server->logout(tcpSock);
+          break;
+        case REGESTER:
+          userStat = server->Register(tcpSock, userId);
+          break;
+        default:
+          break;
+      }
+      return NULL;
+    }
+
+    //处理登录请求
+    int login(int tcpSock){
+      loginRequest lg;
+      int ret = recv(tcpSock, &lg, sizeof(lg), 0);
+      if(ret < 0){
+        perror("login recv failed");
+        return -1;
+      }
+      replyRequest rr;
+      rr._stat = _userMng->userLogin(lg); 
+      rr._userId = lg._userId;
+      //应答
+      ret = send(tcpSock, &rr, sizeof(rr), 0);
+      if(ret < 0){
+        perror("replyRequest error");
+        return -1;
+      }
+      return LOGIN;
+    }
+
+    //处理退出请求
+    int logout(int tcpSock){
+      logoutRequest lr;
+      int ret = recv(tcpSock, &lr, sizeof(lr), 0);
+      if(ret < 0){
+        perror("logout recv error");
+        return -1;
+      }
+      replyRequest rr;
+
+      rr._stat = _userMng->userLogout(lr);
+      //应答
+      rr._userId = lr._userId;
+      ret = send(tcpSock, &rr, sizeof(rr), 0);
+      return LOGOUT;
+    }
+
+    //处理注册请求 /userId为出参
+    int Register(int tcpSock, uint64_t& userId){
+      printf("正在处理登录请求\n");
+      registerRequest rr;
+      int ret = recv(tcpSock, &rr, sizeof(rr), 0);
+      if(ret < 0){
+        perror("Register recv error");
+        return -1;
+      }
+      replyRequest rp;
+      rp._stat = _userMng->userRegister(rr, userId);
+
+      //应答
+      printf("处理登录请求成功, 应答成功\n");
+      rp._userId = userId;
+      ret = send(tcpSock, &rp, sizeof(rp), 0);
+      if(ret < 0){
+        perror("Register reply error");
+      }
+      return LOGOUT;
+    }
+
+    //接收数据入口函数
     static void* pushStart(void* arg){
       Server* ser = (Server*)arg;
       pthread_detach(pthread_self());
@@ -64,6 +224,8 @@ class Server{
       }
       return NULL;
     }
+
+    //发送数据入口函数
     static void* popStart(void* arg){
       Server* ser = (Server*)arg;
       pthread_detach(pthread_self());
@@ -72,72 +234,61 @@ class Server{
         ser->sendMessageToAll();
       }
     }
-    ~Server(){
-      if(_messagePool){
-        delete _messagePool;
-      }
-    }
   private:
+
+    //接收数据
     void recvMessageFromClient(){
       sockaddr_in dest;
       socklen_t len = sizeof(dest);
-      char buf[RECV_BUF_SIZE] = {0};
-      int ret = recvfrom(_sockfd, buf, sizeof(buf) - 1, 0, (struct sockaddr*)&dest, &len);
+      messageInfo mesg;
+      int ret = recvfrom(_sockfd, mesg._data, sizeof(mesg), 0, (struct sockaddr*)&dest, &len);
       if(ret < 0){
         perror("sendto : recvMessageFromClient error");
       }
       else{
-        //接收成功, 把message放到数据池 中
-        printf("接收成功 并把数据放到数据池中\n");
+        uint64_t userId = mesg._userId;
+        //存放数据
+        
         std::string data;
-        data.assign(buf, ret);
+        data.assign(mesg._data, MESSAGE_SIZE);
         _messagePool->pushMsg(data);
-        //把客户端地址信息存放到set中
-        //_clientsAddr.insert(dest);
-        std::string ip = inet_ntoa(dest.sin_addr);
-        uint16_t port = ntohs(dest.sin_port);
-        _clientsAddr.insert(make_pair(ip, port));
-        printf("pthread[%d] 客户端添加成功!\n", pthread_self());
+        _userMng->addAddrPort(userId, dest, len);
+        printf("客户端上线成功 id: %ld\n", userId);
       }
     }
 
+    //给所有客户端发送数据
     void sendMessageToAll(){
       //获取数据
       std::string data;
       _messagePool->popMsg(data);
-      //给所有客户端发送数据
-      //获取每一个客户端的地址信息
-      //auto it = _clientsAddr.begin();
-      //while(it != _clientsAddr.end()){
-      //  sendMessageToOne(data, *it, sizeof(sockaddr_in));
-      //}
-      std::map<std::string, uint16_t>::iterator it = _clientsAddr.begin();
-      int count = 1;
-      while(it != _clientsAddr.end()){
-        sendMessageToOne(data, it->first, it->second);
-        printf("向第 %d 个客户端发送 ip: %s port : %d\n",count,  it->first.c_str(), it->second);
-        ++count;
-        ++it;
+      int num = 0;
+      std::vector<userInfo> useVec = _userMng->getUserOnline(num);
+      printf("拿到了数据: %s, 在线用户: %d 个\n", data.c_str(), num);
+      for(int i = 0; i < num; ++i){
+        sockaddr_in addr  = useVec[i]._addr;
+        socklen_t len = useVec[i]._len;
+        sendMessageToOne(data, addr, len);
       }
     }
-    void sendMessageToOne(std::string& data, std::string ip, uint16_t port){
-      sockaddr_in destAddr;
-      socklen_t destLen = sizeof(destAddr);
-      destAddr.sin_family = AF_INET;
-      destAddr.sin_port = htons(port);
-      destAddr.sin_addr.s_addr = inet_addr(ip.c_str());
+
+    //给一个客户端发送数据
+    void sendMessageToOne(std::string& data,sockaddr_in& destAddr, socklen_t destLen){
       //给一个客户端发送数据
       int ret = sendto(_sockfd, data.c_str(), data.size(), 0, (struct sockaddr*)&destAddr, destLen);
       if(ret < 0){
         perror("sendto : sendMessageToOne error");
       }
+      printf("sendTOone success\n");
     }
   private:
-    //socket句柄
+    //收发数据socket
     int _sockfd;
+    //注册登录退出socket
+    int _tcpSocket;
     pthread_t th;
     //数据池
     msgPool* _messagePool;
-    //每个客户端的地址信息
-    std::multimap<std::string, uint16_t> _clientsAddr;
+    //用户管理
+    userMaganer* _userMng;
 };

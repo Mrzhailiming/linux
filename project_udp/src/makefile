@@ -1,7 +1,7 @@
-.PHONY:chatServer client 
+.PHONY:client chatServer  
 
-chatServer:chatServer.cpp
-	g++ $^ -o $@ -lpthread
 
 client:client.cpp
-	g++ $^ -o $@ -lpthread
+	g++ -std=c++11 $^ -o $@ -lpthread
+chatServer:chatServer.cpp
+	g++ -std=c++11 $^ -o $@ -lpthread
