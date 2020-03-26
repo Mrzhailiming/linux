@@ -34,6 +34,7 @@ class msgPool{
       }
       msg = _msgQueue.front();
       _msgQueue.pop();
+      printf("pop msgPool :%s\n", msg.c_str());
       pthread_mutex_unlock(&_mt);
       pthread_cond_signal(&_proCond);
     }

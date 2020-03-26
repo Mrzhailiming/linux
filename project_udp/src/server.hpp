@@ -248,12 +248,12 @@ class Server{
       else{
         uint64_t userId = mesg._userId;
         //存放数据
-        
+        printf("信息及结构体 %s\n", mesg._data); 
         std::string data;
         data.assign(mesg._data, MESSAGE_SIZE);
         _messagePool->pushMsg(data);
         _userMng->addAddrPort(userId, dest, len);
-        printf("客户端上线成功 id: %ld\n", userId);
+        printf("存放数据: %s 客户id: %ld\n",data.c_str(), userId);
       }
     }
 
