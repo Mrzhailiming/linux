@@ -124,7 +124,6 @@ class tcpServ{
         perror("recv replyRequest failed");
         return false;
       }
-      perror("recv replyRequest success");
       return true;
     }
   private:

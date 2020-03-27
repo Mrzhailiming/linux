@@ -38,7 +38,7 @@ class userMaganer{
     memcpy(user._name, rg._name, NAME_SIZE);
     memcpy(user._password, rg._password, PASSWORD_SIZE);
     memcpy(user._school, rg._school, SCHOOL_SIZE);
-    user._stat = LOGOUT;
+    user._stat = REGESTER;
     user._userId = getNewId();
     userId = user._userId;
     //保证原子操作
@@ -54,11 +54,11 @@ class userMaganer{
     std::map<uint64_t, userInfo>::iterator it = _usersMap.find(userId);
     //id不对
     if(it == _usersMap.end()){
-      return false;
+      return -1;
     }
     //密码不对
     if(strcmp(lg._password, it->second._password) != 0){
-      return false;
+      return -1;
     }
     _usersOnline.push_back(it->second);
     return LOGIN;
@@ -88,12 +88,14 @@ class userMaganer{
   }
   void addAddrPort(uint64_t userId, sockaddr_in addr, socklen_t len){
     std::map<uint64_t, userInfo>::iterator it = _usersMap.find(userId);
-    if(it != _usersMap.end()){
-      printf("注册信息成功 %s %d\n", __FILE__, __LINE__);
+    if(it == _usersMap.end()){
       it->second._addr = addr;
       it->second._len = len;
       _usersOnline.push_back(it->second);
+      printf("注册信息成功 %s %d\n", __FILE__, __LINE__);
+      return;
     }
+    printf("客户不存在!%s %d\n", __FILE__, __LINE__);
   }
   private:
     //存放所有用户信息

@@ -123,8 +123,8 @@ class Server{
       int tcpSock = conInfo->getTcpSock();
       Server* server = (Server*)conInfo->getServer();
       char flag;
-      printf("requestStart 进入线程接收标志位\n");
       int ret = recv(tcpSock, &flag, 1, 0);
+      printf("接收标志位 %c\n", flag);
       if(ret < 0){
         perror("recv failed");
         return NULL;
@@ -135,10 +135,8 @@ class Server{
       }
       uint64_t userId = -1;
       int userStat = -1;
-
-      printf("收到了标志位:%c\n", flag);
       int ch = flag - '0';
-      std::cout << "转换为int" << ch << std::endl;
+      std::cout << "转换为int : " << ch << std::endl;
       switch(ch){
         case LOGIN:
           userStat = server->login(tcpSock);
@@ -158,6 +156,7 @@ class Server{
     //处理登录请求
     int login(int tcpSock){
       loginRequest lg;
+      printf("正在处理登录请求\n");
       int ret = recv(tcpSock, &lg, sizeof(lg), 0);
       if(ret < 0){
         perror("login recv failed");
@@ -168,11 +167,12 @@ class Server{
       rr._userId = lg._userId;
       //应答
       ret = send(tcpSock, &rr, sizeof(rr), 0);
+      printf("应答登录请求 状态 :%d\n", rr._stat);
       if(ret < 0){
         perror("replyRequest error");
         return -1;
       }
-      return LOGIN;
+      return rr._stat;
     }
 
     //处理退出请求
@@ -194,7 +194,7 @@ class Server{
 
     //处理注册请求 /userId为出参
     int Register(int tcpSock, uint64_t& userId){
-      printf("正在处理登录请求\n");
+      printf("正在处理注册请求\n");
       registerRequest rr;
       int ret = recv(tcpSock, &rr, sizeof(rr), 0);
       if(ret < 0){
@@ -205,7 +205,7 @@ class Server{
       rp._stat = _userMng->userRegister(rr, userId);
 
       //应答
-      printf("处理登录请求成功, 应答成功\n");
+      printf("处理注册请求成功, 用户id: %ld\n", userId);
       rp._userId = userId;
       ret = send(tcpSock, &rp, sizeof(rp), 0);
       if(ret < 0){
@@ -248,10 +248,10 @@ class Server{
       else{
         uint64_t userId = mesg._userId;
         //存放数据
-        printf("信息及结构体 %s\n", mesg._data); 
         std::string data;
         data.assign(mesg._data, MESSAGE_SIZE);
         _messagePool->pushMsg(data);
+        printf("绑定地址信息 : %s\n", inet_ntoa(dest.sin_addr));
         _userMng->addAddrPort(userId, dest, len);
         printf("存放数据: %s 客户id: %ld\n",data.c_str(), userId);
       }

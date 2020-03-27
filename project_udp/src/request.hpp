@@ -55,5 +55,4 @@ class connetInfo{
 struct messageInfo{
   uint64_t _userId;
   char _data[MESSAGE_SIZE];
-  int _capacity;
 };

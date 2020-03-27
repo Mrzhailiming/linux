@@ -9,15 +9,18 @@
 #define UDP_PORT 1999
 
 
-tcpServ tser;
 
 //注册
-void userRegister(){
+void userRegister(uint64_t& userId){
+  tcpServ tser;
+  tser.CreateSocket();
+  std::string ip = "192.168.88.128";
+  uint16_t port = TCP_PORT;
+  tser.ConnetServ(ip, port);
   //先发一个标志位
   std::string flag;
   flag = "3";
   tser.Send(flag);
-  printf("send flag success\n");
   registerRequest rg;
   printf("请输入姓名:");
   fflush(stdout);
@@ -28,18 +31,26 @@ void userRegister(){
   printf("请输入密码:");
   fflush(stdout);
   std::cin >> rg._password;
-  //发送请求
+  //发送登录请求
   tser.Send(rg);
-  printf("发送请求成功\n");
+
+  //接收reply
+  replyRequest rp;
+  tser.Recv(rp);
+  userId = rp._userId;
 }
 
 //登录
-void userLogin(){
+void userLogin(uint64_t& userId){
+  tcpServ tser;
+  tser.CreateSocket();
+  std::string ip = "192.168.88.128";
+  uint16_t port = TCP_PORT;
+  tser.ConnetServ(ip, port);
   //先发一个标志位
   std::string flag;
   flag = "1";
   tser.Send(flag);
-  printf("send flag success\n");
   loginRequest li;
   printf("请输入ID:");
   fflush(stdout);
@@ -47,61 +58,62 @@ void userLogin(){
   printf("请输入密码:");
   fflush(stdout);
   std::cin >> li._password;
-  //发送请求
+  //发送登录请求
   tser.Send(li);
-  printf("发送请求成功\n");
+  
+  //接收reply
+  replyRequest rp;
+  if(rp._stat == -1){
+    printf("登陆失败\n");
+    userId = -1;
+    return;
+  }
+  printf("userId 为 : %ld\n", rp._userId);
+  userId = rp._userId;
 }
 
 
-void userLogout(){
+//退出
+void userLogout(uint64_t& userId){
+  tcpServ tser;
+  tser.CreateSocket();
+  std::string ip = "192.168.88.128";
+  uint16_t port = TCP_PORT;
+  tser.ConnetServ(ip, port);
   ;
 }
 
-void menu(){
+uint64_t menu(){
   printf("**************************\n");
   printf("***1.登录 2.登出 3.注册***\n");
   printf("**************************\n");
 
+  uint64_t userId = -1;
   int choice = 0;
   fflush(stdout);
   std::cin >> choice;
   switch(choice){
     case 1:
-      userLogin();
+      userLogin(userId);
       break;
     case 2:
-      userLogout();
+      userLogout(userId);
       break;
     case 3:
-      userRegister();
+      userRegister(userId);
       break;
     default:
       break;
   }
-} 
-int main(){
-  tser.CreateSocket();
-  std::string ip = "192.168.88.128";
-  uint16_t port = TCP_PORT;
-  tser.ConnetServ(ip, port);
-  menu();
-
-  //接收应答
-  replyRequest rep;
-  printf("recv replyRequest ing\n");
-  tser.Recv(rep);
-  printf("recv replyRequest success\n");
-  if(rep._stat == REGESTER){
-    printf("注册成功\n");
-    printf("你的id为 : %d\n", rep._userId);
-    menu();
-  }
-  printf("开始聊天了\n");
+  return userId;
+}
+void chat(uint64_t userId){
   udpServer user;
   user.createudp();
-  port = UDP_PORT;
+  std::string ip = "192.168.88.128";
+  uint16_t port = UDP_PORT;
   messageInfo sendMessg;
-  sendMessg._userId = rep._userId;
+  sendMessg._userId = userId;
   while(1){
     char str[MESSAGE_SIZE] = {0};
     printf("you say:");
@@ -114,5 +126,13 @@ int main(){
     user.Receive(recv, ip, port);
     printf("server say : %s\n", recv.c_str());
   }
+}
+int main(){
+  uint64_t userId = menu();
+  while(userId < 0){
+    printf("账号密码错误\n");
+    userId = menu();
+  }
+  chat(userId);
   return 0;
 }
