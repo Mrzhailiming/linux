@@ -10,12 +10,46 @@
 
 //负责存储所有用户/在线用户信息
 //提供用户注册登录退出接口
+
+
 //单个用户信息
-struct userInfo{
+class userInfo{
+  public:
+
+    //填充name school password
+    void addNameSchPwd(const std::string& name, const std::string& school, const std::string& password){
+      _name = name;
+      _school = school;
+      _password = password;
+    }
+
+    //填充addr len 
+    void addAddrLen(const sockaddr_in& addr, const socklen_t len){
+      memcpy(&_addr, &addr, len);
+      _len = len;
+    }
+
+    //get用户udpaddr
+    sockaddr_in& getAddr(){
+      return _addr;
+    }
+    socklen_t& getLen(){
+      return _len;
+    }
+    //get状态
+    int& getStat(){
+      return _stat;
+    }
+
+    //get密码
+    std::string& getPwd(){
+      return _password;
+    }
+  private:
     uint64_t _userId;
-    char _name[NAME_SIZE];
-    char _school[SCHOOL_SIZE];
-    char _password[PASSWORD_SIZE];
+    std::string _name;
+    std::string _school;
+    std::string _password;
     sockaddr_in _addr;
     socklen_t _len;
     int _stat;
@@ -26,82 +60,88 @@ class userMaganer{
   public:
   userMaganer(){
     pthread_mutex_init(&_mt, NULL);
-    _id = new uint64_t();
+    _newId = new int();
   }
   ~userMaganer(){
     pthread_mutex_destroy(&_mt);
-    delete _id;
+    delete _newId;
   }
-  //用户注册/ 不填充地址信息
-  int userRegister(registerRequest& rg, uint64_t& userId){
-    userInfo user;
-    memcpy(user._name, rg._name, NAME_SIZE);
-    memcpy(user._password, rg._password, PASSWORD_SIZE);
-    memcpy(user._school, rg._school, SCHOOL_SIZE);
-    user._stat = REGESTER;
-    user._userId = getNewId();
-    userId = user._userId;
-    //保证原子操作
+  //用户注册/ 不填充地址信息,返回值为是否登录成功
+  int userRegister(registerRequest& reg, uint64_t& userId){
+
+    if(reg._name.size() == 0 || reg._password.size() == 0 || reg._school.size()){
+      return REGIST_FAILED;
+    }
+    //填充姓名学校密码
+    userInfo newUser;
+    newUser.addNameSchPwd(reg._name, reg._school, reg._password);
+    newUser.getStat() = OFFLINE;
+    
+    //操作临界资源_newId 和线程不安全的unordered_map
     pthread_mutex_lock(&_mt);
-    _usersMap.insert(std::make_pair(user._userId, user));
+    //获取新的id
+    userId = (*_newId)++;
+
+    //放入用户池
+    _usersMap.insert(std::make_pair(userId, newUser));
     pthread_mutex_unlock(&_mt);
-    return REGESTER;
+    return REGIST_SUCCESS;
   }
 
-  //用户登录
+  //用户登录, 返回是否登录成功
   int userLogin(loginRequest& lg){
     uint64_t userId = lg._userId;
-    std::map<uint64_t, userInfo>::iterator it = _usersMap.find(userId);
-    //id不对
-    if(it == _usersMap.end()){
-      return -1;
+    //保证线程安全
+    pthread_mutex_lock(&_mt);
+    std::unordered_map<uint64_t, userInfo>::iterator it = _usersMap.find(userId);
+    //没找到用户/密码不对
+    if(it == _usersMap.end() || it->second.getPwd() != lg._password){
+      return LOGIN_FAILED;
     }
-    //密码不对
-    if(strcmp(lg._password, it->second._password) != 0){
-      return -1;
-    }
+    //更改状态为ONLINE
+    it->second.getStat() = ONLINE;
     _usersOnline.push_back(it->second);
-    return LOGIN;
+    pthread_mutex_unlock(&_mt);
+    return LOGIN_SUCCESS;
   }
 
-  //用户退出
+  //用户退出, 返回是否退出成功
   int userLogout(logoutRequest& lr){
     uint64_t userId = lr._userId;
-    //std::vector<userInfo>::iterator it = std::find(_usersOnline.begin(), _usersOnline.end(),_usersMap[userId]);
-    //if(it == _usersOnline.end()){
-    //  return -1;
-    //}
-    //_usersOnline.erase(it);
-    for(auto& info : _usersOnline){
-      if(info._userId == userId){
-        info._stat = LOGOUT;
-      }
+    std::unordered_map<uint64_t, userInfo>::iterator it = _usersMap.find(userId);
+    if(it != _usersMap.end()){
+      //更改状态
+      it->second.getStat() = OFFLINE;
+      return LOGOUT_SUCCESS;
     }
-    return LOGOUT;
+    return LOGOUT_FAILED;
   }
-  std::vector<userInfo>& getUserOnline(int& num){
-    num = _usersOnline.size();
-    return _usersOnline;
-  }
-  uint64_t getNewId(){
-    return (*_id)++;
-  }
-  void addAddrPort(uint64_t userId, sockaddr_in addr, socklen_t len){
-    std::map<uint64_t, userInfo>::iterator it = _usersMap.find(userId);
+
+  //填充用户地址信息,成功返回0,失败返回-1
+  int addAddrPort(const uint64_t userId, const sockaddr_in& addr, socklen_t len){
+
+    //保证线程安全
+    pthread_mutex_lock(&_mt);
+    std::unordered_map<uint64_t, userInfo>::iterator it = _usersMap.find(userId);
     if(it == _usersMap.end()){
-      it->second._addr = addr;
-      it->second._len = len;
-      _usersOnline.push_back(it->second);
-      printf("注册信息成功 %s %d\n", __FILE__, __LINE__);
-      return;
+      pthread_mutex_unlock(&_mt);
+      return -1;
     }
-    printf("客户不存在!%s %d\n", __FILE__, __LINE__);
+    it->second.addAddrLen(addr, len);
+
+    pthread_mutex_unlock(&_mt);
+    return 0;
+  }
+
+  //get在线用户
+  std::vector<userInfo>& getOnlineUser(){
+    return _usersOnline;
   }
   private:
     //存放所有用户信息
-    uint64_t* _id;
-    std::map<uint64_t, userInfo> _usersMap;
+    std::unordered_map<uint64_t, userInfo> _usersMap;
     pthread_mutex_t _mt;
     //存放在线用户信息
     std::vector<userInfo> _usersOnline;
+    int* _newId;
 };

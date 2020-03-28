@@ -1,0 +1,143 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Accept	tcp.hpp	/^    bool Accept(tcpServ& out){$/;"	f	class:tcpServ
+BUF_SIZE	client.hpp	10;"	d
+Bind	udp.hpp	/^    bool Bind(std::string& ip, uint16_t port){$/;"	f	class:udpServer
+BindIpPort	tcp.hpp	/^    bool BindIpPort(std::string ip, uint16_t port){$/;"	f	class:tcpServ
+Client	client.hpp	/^    Client(){$/;"	f	class:Client
+Client	client.hpp	/^class Client{$/;"	c
+Close	udp.hpp	/^    void Close(){$/;"	f	class:udpServer
+ConnetServ	tcp.hpp	/^    bool ConnetServ(std::string& ip, uint16_t port){$/;"	f	class:tcpServ
+CreateSocket	tcp.hpp	/^    bool CreateSocket(){$/;"	f	class:tcpServ
+LOG	log.hpp	9;"	d
+LOGIN	request.hpp	4;"	d
+LOGIN_FAILED	request.hpp	/^  LOGIN_FAILED,$/;"	e	enum:dealResult
+LOGIN_SUCCESS	request.hpp	/^  LOGIN_SUCCESS,$/;"	e	enum:dealResult
+LOGOUT	request.hpp	5;"	d
+LOGOUT_FAILED	request.hpp	/^  LOGOUT_FAILED$/;"	e	enum:dealResult
+LOGOUT_SUCCESS	request.hpp	/^  LOGOUT_SUCCESS,$/;"	e	enum:dealResult
+Listen	tcp.hpp	/^    bool Listen(int num = 5){$/;"	f	class:tcpServ
+Login	client.cpp	/^void Login(uint64_t& userId){$/;"	f
+Logout	client.cpp	/^void Logout(uint64_t& userId){$/;"	f
+OFFLINE	request.hpp	/^  OFFLINE,$/;"	e	enum:userStat
+ONLINE	request.hpp	/^  ONLINE = 18,$/;"	e	enum:userStat
+QUEUE_SIZE	msgPool.hpp	7;"	d
+RECV_THREAD_NUM	client.hpp	9;"	d
+REGESTER	request.hpp	6;"	d
+REGIST_FAILED	request.hpp	/^  REGIST_FAILED,$/;"	e	enum:dealResult
+REGIST_SUCCESS	request.hpp	/^  REGIST_SUCCESS = 6,$/;"	e	enum:dealResult
+Receive	udp.hpp	/^    bool Receive(std::string& str, std::string& ip, uint16_t& port){$/;"	f	class:udpServer
+Recv	tcp.hpp	/^    bool Recv(replyRequest& rp){$/;"	f	class:tcpServ
+Recv	tcp.hpp	/^    bool Recv(std::string& out){$/;"	f	class:tcpServ
+Register	client.cpp	/^void Register(uint64_t& userId){$/;"	f
+Register	server.hpp	/^    int Register(int tcpSock, uint64_t& userId){$/;"	f	class:Server
+Send	tcp.hpp	/^    bool Send(loginRequest& li){$/;"	f	class:tcpServ
+Send	tcp.hpp	/^    bool Send(logoutRequest& lo){$/;"	f	class:tcpServ
+Send	tcp.hpp	/^    bool Send(registerRequest& rr){$/;"	f	class:tcpServ
+Send	tcp.hpp	/^    bool Send(std::string& buf){$/;"	f	class:tcpServ
+Send	udp.hpp	/^    bool Send(messageInfo message, std::string& ip, uint16_t& port){$/;"	f	class:udpServer
+Server	server.hpp	/^    Server(){$/;"	f	class:Server
+Server	server.hpp	/^class Server{$/;"	c
+TCP_PORT	client.cpp	8;"	d	file:
+TCP_PORT	server.hpp	16;"	d
+THREAD_NUM	server.hpp	17;"	d
+UDP_PORT	client.cpp	9;"	d	file:
+UDP_PORT	server.hpp	15;"	d
+_addr	userManager.hpp	/^    sockaddr_in _addr;$/;"	m	class:userInfo
+_conCond	msgPool.hpp	/^    pthread_cond_t _conCond;$/;"	m	class:msgPool
+_ip	client.hpp	/^    std::string _ip;$/;"	m	class:Client
+_len	userManager.hpp	/^    socklen_t _len;$/;"	m	class:userInfo
+_messagePool	server.hpp	/^    msgPool* _messagePool;$/;"	m	class:Server
+_msgQueue	msgPool.hpp	/^    std::queue<std::string> _msgQueue;$/;"	m	class:msgPool
+_mt	msgPool.hpp	/^    pthread_mutex_t _mt;$/;"	m	class:msgPool
+_mt	userManager.hpp	/^    pthread_mutex_t _mt;$/;"	m	class:userMaganer
+_name	request.hpp	/^    std::string _name;$/;"	m	struct:registerRequest
+_name	userManager.hpp	/^    std::string _name;$/;"	m	class:userInfo
+_newId	userManager.hpp	/^    int* _newId;$/;"	m	class:userMaganer
+_password	request.hpp	/^    std::string _password;$/;"	m	struct:loginRequest
+_password	request.hpp	/^    std::string _password;$/;"	m	struct:registerRequest
+_password	userManager.hpp	/^    std::string _password;$/;"	m	class:userInfo
+_pid	client.hpp	/^    pthread_t _pid;$/;"	m	class:Client
+_port	client.hpp	/^    uint16_t _port;$/;"	m	class:Client
+_proCond	msgPool.hpp	/^    pthread_cond_t _proCond;$/;"	m	class:msgPool
+_queueSize	msgPool.hpp	/^    size_t _queueSize;$/;"	m	class:msgPool
+_school	request.hpp	/^    std::string _school;$/;"	m	struct:registerRequest
+_school	userManager.hpp	/^    std::string _school;$/;"	m	class:userInfo
+_server	request.hpp	/^    void* _server;$/;"	m	class:connetInfo
+_sock	udp.hpp	/^    int _sock;$/;"	m	class:udpServer
+_socketfd	client.hpp	/^    int _socketfd;$/;"	m	class:Client
+_sockfd	request.hpp	/^    int _sockfd;$/;"	m	class:connetInfo
+_sockfd	server.hpp	/^    int _sockfd;$/;"	m	class:Server
+_sockfd	tcp.hpp	/^    int _sockfd;$/;"	m	class:tcpServ
+_stat	request.hpp	/^  int _stat;$/;"	m	struct:replyRequest
+_stat	userManager.hpp	/^    int _stat;$/;"	m	class:userInfo
+_tcpSocket	server.hpp	/^    int _tcpSocket;$/;"	m	class:Server
+_userId	request.hpp	/^    uint64_t _userId;$/;"	m	struct:loginRequest
+_userId	request.hpp	/^    uint64_t _userId;$/;"	m	struct:logoutRequest
+_userId	request.hpp	/^  uint64_t _userId;$/;"	m	struct:replyRequest
+_userId	userManager.hpp	/^    uint64_t _userId;$/;"	m	class:userInfo
+_userMng	server.hpp	/^    userMaganer* _userMng;$/;"	m	class:Server
+_usersMap	userManager.hpp	/^    std::unordered_map<uint64_t, userInfo> _usersMap;$/;"	m	class:userMaganer
+_usersOnline	userManager.hpp	/^    std::vector<userInfo> _usersOnline;$/;"	m	class:userMaganer
+addAddrLen	userManager.hpp	/^    void addAddrLen(const sockaddr_in& addr, const socklen_t len){$/;"	f	class:userInfo
+addAddrPort	userManager.hpp	/^  int addAddrPort(const uint64_t userId, const sockaddr_in& addr, socklen_t len){$/;"	f	class:userMaganer
+addNameSchPwd	userManager.hpp	/^    void addNameSchPwd(const std::string& name, const std::string& school, const std::string& password){$/;"	f	class:userInfo
+chat	client.cpp	/^void chat(uint64_t userId){$/;"	f
+connetInfo	request.hpp	/^    connetInfo(int sockfd, void* server){$/;"	f	class:connetInfo
+connetInfo	request.hpp	/^class connetInfo{$/;"	c
+create	client.hpp	/^    void create(std::string& ip, uint16_t port){$/;"	f	class:Client
+createudp	udp.hpp	/^    bool createudp(){$/;"	f	class:udpServer
+dealResult	request.hpp	/^enum dealResult{$/;"	g
+empty	msgPool.hpp	/^    bool empty(){$/;"	f	class:msgPool
+getAddr	userManager.hpp	/^    sockaddr_in& getAddr(){$/;"	f	class:userInfo
+getLen	userManager.hpp	/^    socklen_t& getLen(){$/;"	f	class:userInfo
+getOnlineUser	userManager.hpp	/^  std::vector<userInfo>& getOnlineUser(){$/;"	f	class:userMaganer
+getPwd	userManager.hpp	/^    std::string& getPwd(){$/;"	f	class:userInfo
+getServer	request.hpp	/^    void* getServer(){$/;"	f	class:connetInfo
+getStat	userManager.hpp	/^    int& getStat(){$/;"	f	class:userInfo
+getTcpSock	request.hpp	/^    int getTcpSock(){$/;"	f	class:connetInfo
+initServer	server.hpp	/^    void initServer(){$/;"	f	class:Server
+isFull	msgPool.hpp	/^    bool isFull(){$/;"	f	class:msgPool
+log	log.hpp	/^inline void log(const std::string& str, const char* file, int line, const std::string& log){$/;"	f
+login	server.hpp	/^    int login(int tcpSock, uint64_t& userId){$/;"	f	class:Server
+loginRequest	request.hpp	/^struct loginRequest{$/;"	s
+logout	server.hpp	/^    int logout(int tcpSock, uint64_t& userId){$/;"	f	class:Server
+logoutRequest	request.hpp	/^struct logoutRequest{$/;"	s
+main	chatServer.cpp	/^int main(){$/;"	f
+main	client.cpp	/^int main(){$/;"	f
+menu	client.cpp	/^uint64_t menu(){$/;"	f
+msgPool	msgPool.hpp	/^    msgPool(){$/;"	f	class:msgPool
+msgPool	msgPool.hpp	/^class msgPool{$/;"	c
+popMsg	msgPool.hpp	/^    void popMsg(std::string& msg){$/;"	f	class:msgPool
+popStart	server.hpp	/^    static void* popStart(void* arg){$/;"	f	class:Server
+pushMsg	msgPool.hpp	/^    void pushMsg(std::string& msg){$/;"	f	class:msgPool
+pushStart	server.hpp	/^    static void* pushStart(void* arg){$/;"	f	class:Server
+recvMessage	client.hpp	/^    void recvMessage(){$/;"	f	class:Client
+recvMessageFromClient	server.hpp	/^    void recvMessageFromClient(){$/;"	f	class:Server
+recvStart	client.hpp	/^    static void* recvStart(void* arg){$/;"	f	class:Client
+registerRequest	request.hpp	/^struct registerRequest{$/;"	s
+replyRequest	request.hpp	/^struct replyRequest{$/;"	s
+requestStart	server.hpp	/^    static void* requestStart(void* arg){$/;"	f	class:Server
+sendMessage	client.hpp	/^    void sendMessage(){$/;"	f	class:Client
+sendMessageToAll	server.hpp	/^    void sendMessageToAll(){$/;"	f	class:Server
+sendMessageToOne	server.hpp	/^    void sendMessageToOne(std::string& data,sockaddr_in& destAddr, socklen_t destLen){$/;"	f	class:Server
+sendStart	client.hpp	/^    static void* sendStart(void* arg){$/;"	f	class:Client
+start	server.hpp	/^    void start(){$/;"	f	class:Server
+tcpServ	tcp.hpp	/^    tcpServ(){$/;"	f	class:tcpServ
+tcpServ	tcp.hpp	/^class tcpServ{$/;"	c
+th	server.hpp	/^    pthread_t th;$/;"	m	class:Server
+udpServer	udp.hpp	/^    udpServer(){$/;"	f	class:udpServer
+udpServer	udp.hpp	/^class udpServer{$/;"	c
+userInfo	userManager.hpp	/^class userInfo{$/;"	c
+userLogin	userManager.hpp	/^  int userLogin(loginRequest& lg){$/;"	f	class:userMaganer
+userLogout	userManager.hpp	/^  int userLogout(logoutRequest& lr){$/;"	f	class:userMaganer
+userMaganer	userManager.hpp	/^  userMaganer(){$/;"	f	class:userMaganer
+userMaganer	userManager.hpp	/^class userMaganer{$/;"	c
+userRegister	userManager.hpp	/^  int userRegister(registerRequest& reg, uint64_t& userId){$/;"	f	class:userMaganer
+userStat	request.hpp	/^enum userStat{$/;"	g
+~Server	server.hpp	/^    ~Server(){$/;"	f	class:Server
+~userMaganer	userManager.hpp	/^  ~userMaganer(){$/;"	f	class:userMaganer

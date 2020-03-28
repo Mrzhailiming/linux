@@ -11,7 +11,7 @@
 
 
 //注册
-void userRegister(uint64_t& userId){
+void Register(uint64_t& userId){
   tcpServ tser;
   tser.CreateSocket();
   std::string ip = "192.168.88.128";
@@ -41,7 +41,7 @@ void userRegister(uint64_t& userId){
 }
 
 //登录
-void userLogin(uint64_t& userId){
+void Login(uint64_t& userId){
   tcpServ tser;
   tser.CreateSocket();
   std::string ip = "192.168.88.128";
@@ -74,7 +74,7 @@ void userLogin(uint64_t& userId){
 
 
 //退出
-void userLogout(uint64_t& userId){
+void Logout(uint64_t& userId){
   tcpServ tser;
   tser.CreateSocket();
   std::string ip = "192.168.88.128";
@@ -94,13 +94,13 @@ uint64_t menu(){
   std::cin >> choice;
   switch(choice){
     case 1:
-      userLogin(userId);
+      Login(userId);
       break;
     case 2:
-      userLogout(userId);
+      Logout(userId);
       break;
     case 3:
-      userRegister(userId);
+      Register(userId);
       break;
     default:
       break;

@@ -5,24 +5,35 @@
 #define  LOGOUT 2
 #define  REGESTER 3
 
-#define NAME_SIZE 24
-#define SCHOOL_SIZE 24
-#define PASSWORD_SIZE 16
-#define MESSAGE_SIZE 1024
-//登录/注册/退出请求
-struct loginRequest{
-    uint64_t _userId;
-    char _password[PASSWORD_SIZE];
+enum dealResult{
+  REGIST_SUCCESS = 6,
+  LOGIN_SUCCESS,
+  REGIST_FAILED,
+  LOGIN_FAILED,
+  LOGOUT_SUCCESS,
+  LOGOUT_FAILED
 };
 
+enum userStat{
+  ONLINE = 18,
+  OFFLINE,
+};
+//登录
+struct loginRequest{
+    uint64_t _userId;
+    std::string _password;
+};
+
+//退出
 struct logoutRequest{
     uint64_t _userId;
 };
 
+//注册
 struct registerRequest{
-    char _name[NAME_SIZE];
-    char _school[SCHOOL_SIZE];
-    char _password[PASSWORD_SIZE];
+    std::string _name;
+    std::string _school;
+    std::string _password;
 };
 
 //应答信息
@@ -52,7 +63,3 @@ class connetInfo{
 };
 
 
-struct messageInfo{
-  uint64_t _userId;
-  char _data[MESSAGE_SIZE];
-};
