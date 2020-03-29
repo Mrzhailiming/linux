@@ -1,138 +1,117 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <istream>
-#include "udp.hpp"
-#include "tcp.hpp"
+
+
+
 #include "server.hpp"
+#include "message.hpp"
+#include "clientServer.hpp"
+
+
 #define TCP_PORT 1997
 #define UDP_PORT 1999
 
 
 
 //注册
-void Register(uint64_t& userId){
-  tcpServ tser;
-  tser.CreateSocket();
-  std::string ip = "192.168.88.128";
-  uint16_t port = TCP_PORT;
-  tser.ConnetServ(ip, port);
-  //先发一个标志位
-  std::string flag;
-  flag = "3";
-  tser.Send(flag);
-  registerRequest rg;
+bool Register(clientServer& cs){
+  std::string name;
+  std::string school;
+  std::string password;
   printf("请输入姓名:");
   fflush(stdout);
-  std::cin >> rg._name;
+  std::cin >> name;
   printf("请输入学校:");
   fflush(stdout);
-  std::cin >> rg._school;
+  std::cin >> school;
   printf("请输入密码:");
   fflush(stdout);
-  std::cin >> rg._password;
-  //发送登录请求
-  tser.Send(rg);
+  std::cin >> password;
 
-  //接收reply
+  //填充clientServer
+  cs.sendRequest(REGESTER, 0, name, school, password);
+  cs.getName() = name;
+  cs.getSchool() = school;
+  //接收应答
   replyRequest rp;
-  tser.Recv(rp);
-  userId = rp._userId;
+  cs.recvReply(rp);
+  if(rp._stat == REGIST_SUCCESS){
+    cs.getId() = rp._userId;
+    printf("your id is %ld\n", rp._userId);
+    return true;
+  }
+  else{
+    return false;
+  }
 }
 
 //登录
-void Login(uint64_t& userId){
-  tcpServ tser;
-  tser.CreateSocket();
-  std::string ip = "192.168.88.128";
-  uint16_t port = TCP_PORT;
-  tser.ConnetServ(ip, port);
-  //先发一个标志位
-  std::string flag;
-  flag = "1";
-  tser.Send(flag);
-  loginRequest li;
+bool Login(clientServer& cs){
+  uint64_t userId;
+  std::string password;
   printf("请输入ID:");
   fflush(stdout);
-  std::cin >> li._userId;
+  std::cin >> userId;
   printf("请输入密码:");
   fflush(stdout);
-  std::cin >> li._password;
-  //发送登录请求
-  tser.Send(li);
-  
-  //接收reply
+  std::cin >> password;
+  cs.sendRequest(LOGIN, userId, NULL, NULL, password);
+
+  printf("to recv reply\n");
   replyRequest rp;
-  if(rp._stat == -1){
-    printf("登陆失败\n");
-    userId = -1;
-    return;
+  cs.recvReply(rp);
+  if(rp._stat == LOGIN_SUCCESS){
+    printf("LOGIN_SUCCESS %ld\n", cs.getId());
+    return true;
   }
-  printf("userId 为 : %ld\n", rp._userId);
-  userId = rp._userId;
+  printf("LOGIN_FAILED %d\n", rp._stat);
+  return false;
 }
 
 
 //退出
-void Logout(uint64_t& userId){
-  tcpServ tser;
-  tser.CreateSocket();
-  std::string ip = "192.168.88.128";
-  uint16_t port = TCP_PORT;
-  tser.ConnetServ(ip, port);
-  ;
+bool Logout(clientServer& cs){
+  return true;
 }
 
-uint64_t menu(){
+bool menu(clientServer& cs){
+  clientServer clientSer;
+  clientSer.initServer();
   printf("**************************\n");
   printf("***1.登录 2.登出 3.注册***\n");
   printf("**************************\n");
-
-  uint64_t userId = -1;
-  int choice = 0;
+  char ch;
+  printf("请输入选项:");
   fflush(stdout);
-  std::cin >> choice;
-  switch(choice){
-    case 1:
-      Login(userId);
+  std::cin >> ch;
+  switch(ch - '0'){
+    case LOGIN:
+      Login(clientSer);
       break;
-    case 2:
-      Logout(userId);
+    case LOGOUT:
+      Logout(clientSer);
       break;
-    case 3:
-      Register(userId);
+    case REGESTER:
+      Register(clientSer);
       break;
     default:
+       LOG("INFO", "选项不合法");
+      return false;
       break;
   }
-  return userId;
-}
-void chat(uint64_t userId){
-  udpServer user;
-  user.createudp();
-  std::string ip = "192.168.88.128";
-  uint16_t port = UDP_PORT;
-  messageInfo sendMessg;
-  sendMessg._userId = userId;
-  while(1){
-    char str[MESSAGE_SIZE] = {0};
-    printf("you say:");
-    fflush(stdout);
-    std::cin >> str;
-    memcpy(sendMessg._data, str, sizeof(str));
-    user.Send(sendMessg, ip, port);
-
-    std::string recv;
-    user.Receive(recv, ip, port);
-    printf("server say : %s\n", recv.c_str());
+  if(clientSer.getStat() == OFFLINE){
+    return false;
   }
+  cs = clientSer;
+  return true;
 }
 int main(){
-  uint64_t userId = menu();
-  while(userId < 0){
-    printf("账号密码错误\n");
-    userId = menu();
+  clientServer cs;
+  while(menu(cs) == false){
+    ;
   }
-  chat(userId);
+  printf("your ID is %ld\n", cs.getId());
+
   return 0;
 }

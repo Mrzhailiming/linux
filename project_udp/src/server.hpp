@@ -7,10 +7,12 @@
 #include <stdlib.h>
 #include <pthread.h>
 
+
 #include "msgPool.hpp"
 #include "request.hpp"
 #include "userManager.hpp"
 #include "log.hpp"
+#include "message.hpp"
 
 #define UDP_PORT 1999
 #define TCP_PORT 1997
@@ -92,9 +94,12 @@ class Server{
       for(int i = 0; i < THREAD_NUM; ++i){
         int ret = pthread_create(&th, NULL, pushStart, (void*)this);
         if(ret < 0){
-          LOG("INFO","thread create error");
+          LOG("ERROR","thread create error");
         }
         ret = pthread_create(&th, NULL, popStart, (void*)this);
+        if(ret < 0){
+          LOG("ERROR","thread create error");
+        }
       }
       LOG("INFO", "sendto and recvfrom thread create success");
       //创建请求处理线程, 调用accept获取连接
@@ -154,6 +159,13 @@ class Server{
       rr._stat = userStat;
       rr._userId = userId;
       LOG("INFO", "reply success");
+      ret = send(tcpSock, &rr, sizeof(rr), 0);
+      if(ret < 0){
+        LOG("ERROR", "reply failed");
+      }
+      //关闭tcpsockfd,释放资源
+      close(tcpSock);
+      delete conInfo;
       return NULL;
     }
 
@@ -218,16 +230,28 @@ class Server{
     void recvMessageFromClient(){
       sockaddr_in dest;
       socklen_t len = sizeof(dest);
-      std::string mesg;
-      int ret = recvfrom(_sockfd, &mesg, sizeof(mesg), 0, (struct sockaddr*)&dest, &len);
+      char buf[1024 * 10] = {0};
+      int ret = recvfrom(_sockfd, buf, sizeof(buf) - 1, 0, (struct sockaddr*)&dest, &len);
       if(ret < 0){
         LOG("WARNING","sendto : recvMessageFromClient error");
       }
       else{
-        //存放数据
-        std::string data;
-        _messagePool->pushMsg(data);
-        //_userMng->addAddrPort(userId, dest, len);
+        //存放数据, 使用json反序列化mesg, 得到ID等用户信息
+        std::string mesg;
+        mesg.assign(buf, ret);
+        //反序列化字符串
+        Message json;
+        json.Deser(mesg);
+        _messagePool->pushMsg(json.getData());
+        //如果用户第一次发消息,则填充地址信息
+        if(_userMng->addAddrPort(json.getUserId(), dest, len) != 0){
+          LOG("ERROR", "user not found");
+        }
+        else{
+          //添加用户到在线列表
+          _userMng->addOnlineUser(json.getUserId());
+          LOG("INFO", "user add online");
+        }
       }
     }
 
@@ -238,18 +262,20 @@ class Server{
       _messagePool->popMsg(data);
       std::vector<userInfo> userVec = _userMng->getOnlineUser();
       for(auto& user : userVec){
+        //群发消息
         sendMessageToOne(data, user.getAddr(), user.getLen());
       }
     }
 
     //给一个客户端发送数据
-    void sendMessageToOne(std::string& data,sockaddr_in& destAddr, socklen_t destLen){
+    void sendMessageToOne(std::string& data, struct sockaddr_in& destAddr, socklen_t destLen){
       //给一个客户端发送数据
       int ret = sendto(_sockfd, data.c_str(), data.size(), 0, (struct sockaddr*)&destAddr, destLen);
       if(ret < 0){
         LOG("WARNING","sendto : sendMessageToOne error");
+        //缓存没发送的信息, 和用户
       }
-      printf("sendTOone success\n");
+      LOG("INFO", "sendTOone succes");
     }
   private:
     //收发数据socket

@@ -2,11 +2,14 @@
 #include <arpa/inet.h>
 #include <unordered_map>
 #include <string.h>
-#include <vector>
 #include <algorithm>
-
+#include <vector>
 #include <map>
+
+
 #include "request.hpp"
+#include "log.hpp"
+
 
 //负责存储所有用户/在线用户信息
 //提供用户注册登录退出接口
@@ -30,7 +33,7 @@ class userInfo{
     }
 
     //get用户udpaddr
-    sockaddr_in& getAddr(){
+    struct sockaddr_in& getAddr(){
       return _addr;
     }
     socklen_t& getLen(){
@@ -44,6 +47,11 @@ class userInfo{
     //get密码
     std::string& getPwd(){
       return _password;
+    }
+
+    //get用户ID
+    uint64_t& getId(){
+      return _userId;
     }
   private:
     uint64_t _userId;
@@ -69,22 +77,25 @@ class userMaganer{
   //用户注册/ 不填充地址信息,返回值为是否登录成功
   int userRegister(registerRequest& reg, uint64_t& userId){
 
-    if(reg._name.size() == 0 || reg._password.size() == 0 || reg._school.size()){
+    if(strlen(reg._name) == 0 || strlen(reg._password) == 0 || strlen(reg._school) == 0){
+      LOG("INFO", "regist failed");//注册失败
       return REGIST_FAILED;
     }
     //填充姓名学校密码
     userInfo newUser;
     newUser.addNameSchPwd(reg._name, reg._school, reg._password);
-    newUser.getStat() = OFFLINE;
+    newUser.getStat() = LOGINED;//更改状态为已注册
     
     //操作临界资源_newId 和线程不安全的unordered_map
     pthread_mutex_lock(&_mt);
     //获取新的id
     userId = (*_newId)++;
+    newUser.getId() = userId;
 
     //放入用户池
     _usersMap.insert(std::make_pair(userId, newUser));
     pthread_mutex_unlock(&_mt);
+    printf("Register deal success, ID: %ld status : %d FILE : %s LINE %d\n", userId, newUser.getStat(), __FILE__, __LINE__);
     return REGIST_SUCCESS;
   }
 
@@ -96,12 +107,14 @@ class userMaganer{
     std::unordered_map<uint64_t, userInfo>::iterator it = _usersMap.find(userId);
     //没找到用户/密码不对
     if(it == _usersMap.end() || it->second.getPwd() != lg._password){
+      LOG("INFO", "user not found or pwd not correct");
       return LOGIN_FAILED;
     }
     //更改状态为ONLINE
-    it->second.getStat() = ONLINE;
+    it->second.getStat() = LOGINED;
     _usersOnline.push_back(it->second);
     pthread_mutex_unlock(&_mt);
+    LOG("INFO", "user not found or pwd not correct");
     return LOGIN_SUCCESS;
   }
 
@@ -123,16 +136,36 @@ class userMaganer{
     //保证线程安全
     pthread_mutex_lock(&_mt);
     std::unordered_map<uint64_t, userInfo>::iterator it = _usersMap.find(userId);
+    //用户不存在
     if(it == _usersMap.end()){
       pthread_mutex_unlock(&_mt);
+      LOG("WARNING", "user not found");
       return -1;
     }
+    //用户如果在线,就不用填充地址信息,
+    if(it->second.getStat() == ONLINE){
+      return 0;
+    }
+    //用户为LOGINED,则填充地址信息,并把状态改为ONLINE
     it->second.addAddrLen(addr, len);
+    it->second.getStat() = ONLINE;
 
     pthread_mutex_unlock(&_mt);
     return 0;
   }
 
+  //增加在线用户
+  void addOnlineUser(uint64_t userId){
+    pthread_mutex_lock(&_mt);
+    std::unordered_map<uint64_t, userInfo>::iterator it = _usersMap.find(userId);
+    if(it == _usersMap.end()){
+      LOG("ERROR", "user not found");
+    }
+    else{
+      _usersOnline.push_back(it->second);
+    }
+    pthread_mutex_unlock(&_mt);
+  }
   //get在线用户
   std::vector<userInfo>& getOnlineUser(){
     return _usersOnline;
