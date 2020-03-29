@@ -121,16 +121,18 @@ class clientServer{
     }
 
     //发送请求
-    bool sendRequest(char ch, uint64_t userId = -1, std::string name = "", std::string school = "", std::string password = ""){
-
+    bool sendRequest(int flag, uint64_t userId = -1, std::string name = "null", std::string school = "null", std::string password = "null"){
       //先发送标志
-      sendFlag(ch);
+      sendFlag(flag + '0');
+      printf("send login flag success\n");
       //在发送请求信息
-      switch(ch - '0'){
+      switch(flag){
         case LOGIN:
           loginRequest li;
-          li._userId = _userId;
-          memcpy(li._password,password.c_str(), password.size());
+          li._userId = userId;
+          memset(li._password, 0, PASSWAOR_SIZE);
+          memcpy(li._password, password.c_str(), password.size());
+          printf("password: %s %s %d\n", li._password, __FILE__, __LINE__);
           return _loginReq(li);
           break;
         case LOGOUT:
@@ -140,6 +142,10 @@ class clientServer{
           break;
         case REGESTER:
           registerRequest rg;
+          //在使用之前要memeset
+          memset(rg._name, 0, NAME_SIZE);
+          memset(rg._school, 0, SCHOOL_SIZE);
+          memset(rg._password, 0, PASSWAOR_SIZE);
           memcpy(rg._name, name.c_str(), name.size());
           memcpy(rg._school, school.c_str(), school.size());
           memcpy(rg._password, password.c_str(), password.size());
@@ -163,18 +169,18 @@ class clientServer{
       return _userId;
     }
 
-    int getStat(){
+    int& getStat(){
       return _stat;
     }
   private:
     //发送标志
-    bool sendFlag(char ch){
+    bool sendFlag(const char ch){
       int ret = send(_tcpSock, &ch, 1, 0);
       if(ret < 0){
         LOG("ERROR", "send flad failed");
         return false;
       }
-      LOG("INFO", "send flad success");
+      LOG("INFO", "send flag success");
       return true;
     }
     //发送登录请求

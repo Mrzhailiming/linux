@@ -53,6 +53,12 @@ class userInfo{
     uint64_t& getId(){
       return _userId;
     }
+    std::string& getName(){
+      return _name;
+    }
+    std::string& getSchool(){
+      return _school;
+    }
   private:
     uint64_t _userId;
     std::string _name;
@@ -83,8 +89,11 @@ class userMaganer{
     }
     //填充姓名学校密码
     userInfo newUser;
+    LOG("INFO", "fill name school password");
+    newUser.getPwd() = reg._password;
     newUser.addNameSchPwd(reg._name, reg._school, reg._password);
     newUser.getStat() = LOGINED;//更改状态为已注册
+    printf("name:%s school:%s password: %s id:%ld\n", newUser.getName().c_str(), newUser.getSchool().c_str(), newUser.getPwd().c_str(), newUser.getId());
     
     //操作临界资源_newId 和线程不安全的unordered_map
     pthread_mutex_lock(&_mt);
@@ -92,6 +101,7 @@ class userMaganer{
     userId = (*_newId)++;
     newUser.getId() = userId;
 
+    printf("name:%s school:%s password: %s id:%ld\n", reg._name,reg._school, reg._password, newUser.getId());
     //放入用户池
     _usersMap.insert(std::make_pair(userId, newUser));
     pthread_mutex_unlock(&_mt);
@@ -106,15 +116,17 @@ class userMaganer{
     pthread_mutex_lock(&_mt);
     std::unordered_map<uint64_t, userInfo>::iterator it = _usersMap.find(userId);
     //没找到用户/密码不对
-    if(it == _usersMap.end() || it->second.getPwd() != lg._password){
+    printf("log:INFO useId:%ld passwor:%s\n", userId, lg._password);
+    if(it == _usersMap.end() || strcmp(it->second.getPwd().c_str(), lg._password) != 0){
       LOG("INFO", "user not found or pwd not correct");
+      pthread_mutex_unlock(&_mt);
       return LOGIN_FAILED;
     }
     //更改状态为ONLINE
     it->second.getStat() = LOGINED;
     _usersOnline.push_back(it->second);
     pthread_mutex_unlock(&_mt);
-    LOG("INFO", "user not found or pwd not correct");
+    LOG("INFO", "user login success");
     return LOGIN_SUCCESS;
   }
 

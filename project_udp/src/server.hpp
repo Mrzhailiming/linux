@@ -141,7 +141,8 @@ class Server{
       }
       uint64_t userId = -1;
       int userStat = -1;//为请求的处理结果
-      switch(flag){
+      printf("INFO requestStart recv flag %c\n", flag);
+      switch(flag - '0'){
         case LOGIN:
           userStat = server->login(tcpSock, userId);
           break;
@@ -177,6 +178,7 @@ class Server{
         LOG("ERROR","Register recv error");
         return REGIST_FAILED;
       }
+      LOG("INFO", "dealwith Register ing");
       return _userMng->userRegister(reg, userId);
     }
 
@@ -188,6 +190,7 @@ class Server{
         LOG("ERROR","login recv failed");
         return LOGIN_FAILED;
       }
+      LOG("INFO", "dealwith login ing");
       userId = lg._userId;
       return _userMng->userLogin(lg);
     }

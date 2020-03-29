@@ -1,7 +1,7 @@
 #include "udp.hpp"
-using namespace std;
 
-int main(int arg, char* argv[]){
+
+int mian(int arg, char* argv[]){
   if(arg != 3){
     perror("参数个数错误");
     return 0;
@@ -18,12 +18,12 @@ int main(int arg, char* argv[]){
     std::string peerip;
     uint16_t peerport;
     u.Receive(ret, peerip, peerport);
-    cout << "cli:" << ret.c_str() << endl;
+    cout << ret.c_str() << endl;
 
     cout << "ser:";
+    fflush(cin);
     cin >> ret;
-    u.Send(ret, peerip, peerport);
+    u.Send()
   }
-  u.Close();
-  return 0;
+
 }

@@ -56,12 +56,14 @@ bool Login(clientServer& cs){
   printf("请输入密码:");
   fflush(stdout);
   std::cin >> password;
-  cs.sendRequest(LOGIN, userId, NULL, NULL, password);
+  cs.sendRequest(LOGIN, userId, "", "", password);
 
-  printf("to recv reply\n");
+  LOG("INFO", "sendRequest success wait recvReply");
   replyRequest rp;
   cs.recvReply(rp);
   if(rp._stat == LOGIN_SUCCESS){
+    cs.getStat() = ONLINE;
+    cs.getId() = rp._userId;
     printf("LOGIN_SUCCESS %ld\n", cs.getId());
     return true;
   }
@@ -111,7 +113,7 @@ int main(){
   while(menu(cs) == false){
     ;
   }
-  printf("your ID is %ld\n", cs.getId());
 
+  printf("xiabanle\n");
   return 0;
 }

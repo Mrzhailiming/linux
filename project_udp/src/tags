@@ -4,12 +4,6 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
-Accept	tcp.hpp	/^    bool Accept(tcpServ& out){$/;"	f	class:tcpServ
-Bind	udp.hpp	/^    bool Bind(std::string& ip, uint16_t port){$/;"	f	class:udpServer
-BindIpPort	tcp.hpp	/^    bool BindIpPort(std::string ip, uint16_t port){$/;"	f	class:tcpServ
-Close	udp.hpp	/^    void Close(){$/;"	f	class:udpServer
-ConnetServ	tcp.hpp	/^    bool ConnetServ(std::string& ip, uint16_t port){$/;"	f	class:tcpServ
-CreateSocket	tcp.hpp	/^    bool CreateSocket(){$/;"	f	class:tcpServ
 Deser	message.hpp	/^    void Deser(std::string msg){$/;"	f	class:Message
 IP	clientServer.hpp	15;"	d
 LOG	log.hpp	9;"	d
@@ -20,7 +14,6 @@ LOGIN_SUCCESS	request.hpp	/^  LOGIN_SUCCESS,     \/\/登录成功$/;"	e	enum:dea
 LOGOUT	request.hpp	6;"	d
 LOGOUT_FAILED	request.hpp	/^  LOGOUT_FAILED      \/\/退出失败$/;"	e	enum:dealResult
 LOGOUT_SUCCESS	request.hpp	/^  LOGOUT_SUCCESS,    \/\/退出成功$/;"	e	enum:dealResult
-Listen	tcp.hpp	/^    bool Listen(int num = 5){$/;"	f	class:tcpServ
 Login	client.cpp	/^bool Login(clientServer& cs){$/;"	f
 Logout	client.cpp	/^bool Logout(clientServer& cs){$/;"	f
 Message	message.hpp	/^class Message{$/;"	c
@@ -32,17 +25,9 @@ QUEUE_SIZE	msgPool.hpp	7;"	d
 REGESTER	request.hpp	7;"	d
 REGIST_FAILED	request.hpp	/^  REGIST_FAILED,     \/\/注册失败$/;"	e	enum:dealResult
 REGIST_SUCCESS	request.hpp	/^  REGIST_SUCCESS = 4,\/\/注册成功$/;"	e	enum:dealResult
-Receive	udp.hpp	/^    bool Receive(std::string& str, std::string& ip, uint16_t& port){$/;"	f	class:udpServer
-Recv	tcp.hpp	/^    bool Recv(replyRequest& rp){$/;"	f	class:tcpServ
-Recv	tcp.hpp	/^    bool Recv(std::string& out){$/;"	f	class:tcpServ
 Register	client.cpp	/^bool Register(clientServer& cs){$/;"	f
 Register	server.hpp	/^    int Register(int tcpSock, uint64_t& userId){$/;"	f	class:Server
 SCHOOL_SIZE	request.hpp	11;"	d
-Send	tcp.hpp	/^    bool Send(loginRequest& li){$/;"	f	class:tcpServ
-Send	tcp.hpp	/^    bool Send(logoutRequest& lo){$/;"	f	class:tcpServ
-Send	tcp.hpp	/^    bool Send(registerRequest& rr){$/;"	f	class:tcpServ
-Send	tcp.hpp	/^    bool Send(std::string& buf){$/;"	f	class:tcpServ
-Send	udp.hpp	/^    bool Send(messageInfo message, std::string& ip, uint16_t& port){$/;"	f	class:udpServer
 Server	server.hpp	/^    Server(){$/;"	f	class:Server
 Server	server.hpp	/^class Server{$/;"	c
 TCP_PORT	client.cpp	12;"	d	file:
@@ -78,10 +63,8 @@ _school	message.hpp	/^    std::string _school;$/;"	m	class:Message
 _school	request.hpp	/^    char _school[SCHOOL_SIZE];$/;"	m	struct:registerRequest
 _school	userManager.hpp	/^    std::string _school;$/;"	m	class:userInfo
 _server	request.hpp	/^    void* _server;$/;"	m	class:connetInfo
-_sock	udp.hpp	/^    int _sock;$/;"	m	class:udpServer
 _sockfd	request.hpp	/^    int _sockfd;$/;"	m	class:connetInfo
 _sockfd	server.hpp	/^    int _sockfd;$/;"	m	class:Server
-_sockfd	tcp.hpp	/^    int _sockfd;$/;"	m	class:tcpServ
 _stat	clientServer.hpp	/^    int _stat;$/;"	m	class:clientServer
 _stat	request.hpp	/^  int _stat;$/;"	m	struct:replyRequest
 _stat	userManager.hpp	/^    int _stat;$/;"	m	class:userInfo
@@ -107,7 +90,6 @@ clientServer	clientServer.hpp	/^    clientServer(){$/;"	f	class:clientServer
 clientServer	clientServer.hpp	/^class clientServer{$/;"	c
 connetInfo	request.hpp	/^    connetInfo(int sockfd, void* server){$/;"	f	class:connetInfo
 connetInfo	request.hpp	/^class connetInfo{$/;"	c
-createudp	udp.hpp	/^    bool createudp(){$/;"	f	class:udpServer
 dealResult	request.hpp	/^enum dealResult{$/;"	g
 empty	msgPool.hpp	/^    bool empty(){$/;"	f	class:msgPool
 getAddr	userManager.hpp	/^    struct sockaddr_in& getAddr(){$/;"	f	class:userInfo
@@ -122,6 +104,7 @@ getPwd	userManager.hpp	/^    std::string& getPwd(){$/;"	f	class:userInfo
 getSchool	clientServer.hpp	/^    std::string& getSchool(){$/;"	f	class:clientServer
 getSchool	message.hpp	/^    std::string& getSchool(){$/;"	f	class:Message
 getServer	request.hpp	/^    void* getServer(){$/;"	f	class:connetInfo
+getStat	clientServer.hpp	/^    int getStat(){$/;"	f	class:clientServer
 getStat	userManager.hpp	/^    int& getStat(){$/;"	f	class:userInfo
 getTcpSock	request.hpp	/^    int getTcpSock(){$/;"	f	class:connetInfo
 getUserId	message.hpp	/^    uint64_t getUserId(){$/;"	f	class:Message
@@ -135,7 +118,7 @@ logout	server.hpp	/^    int logout(int tcpSock, uint64_t& userId){$/;"	f	class:S
 logoutRequest	request.hpp	/^struct logoutRequest{$/;"	s
 main	chatServer.cpp	/^int main(){$/;"	f
 main	client.cpp	/^int main(){$/;"	f
-menu	client.cpp	/^bool menu(){$/;"	f
+menu	client.cpp	/^bool menu(clientServer& cs){$/;"	f
 msgPool	msgPool.hpp	/^    msgPool(){$/;"	f	class:msgPool
 msgPool	msgPool.hpp	/^class msgPool{$/;"	c
 popMsg	msgPool.hpp	/^    void popMsg(std::string& msg){$/;"	f	class:msgPool
@@ -148,11 +131,11 @@ recvReply	clientServer.hpp	/^    bool recvReply(replyRequest& rp){$/;"	f	class:c
 registerRequest	request.hpp	/^struct registerRequest{$/;"	s
 replyRequest	request.hpp	/^struct replyRequest{$/;"	s
 requestStart	server.hpp	/^    static void* requestStart(void* arg){$/;"	f	class:Server
-sendFlag	clientServer.hpp	/^    bool sendFlag(char ch){$/;"	f	class:clientServer
+sendFlag	clientServer.hpp	/^    bool sendFlag(const char ch){$/;"	f	class:clientServer
 sendMesg	clientServer.hpp	/^    bool sendMesg(std::string& data){$/;"	f	class:clientServer
 sendMessageToAll	server.hpp	/^    void sendMessageToAll(){$/;"	f	class:Server
 sendMessageToOne	server.hpp	/^    void sendMessageToOne(std::string& data, struct sockaddr_in& destAddr, socklen_t destLen){$/;"	f	class:Server
-sendRequest	clientServer.hpp	/^    bool sendRequest(char ch, uint64_t userId = -1, std::string name = "", std::string school = "", std::string password = ""){$/;"	f	class:clientServer
+sendRequest	clientServer.hpp	/^    bool sendRequest(int flag, uint64_t userId = -1, std::string name = "null", std::string school = "null", std::string password = "null"){$/;"	f	class:clientServer
 ser	message.hpp	/^    void ser(std::string& msg){$/;"	f	class:Message
 setData	message.hpp	/^    void setData(std::string& data){$/;"	f	class:Message
 setId	clientServer.hpp	/^    void setId(uint64_t userId){$/;"	f	class:clientServer
@@ -160,11 +143,7 @@ setId	message.hpp	/^    void setId(uint64_t Id){$/;"	f	class:Message
 setName	message.hpp	/^    void setName(std::string& name){$/;"	f	class:Message
 setSchool	message.hpp	/^    void setSchool(std::string& school){$/;"	f	class:Message
 start	server.hpp	/^    void start(){$/;"	f	class:Server
-tcpServ	tcp.hpp	/^    tcpServ(){$/;"	f	class:tcpServ
-tcpServ	tcp.hpp	/^class tcpServ{$/;"	c
 th	server.hpp	/^    pthread_t th;$/;"	m	class:Server
-udpServer	udp.hpp	/^    udpServer(){$/;"	f	class:udpServer
-udpServer	udp.hpp	/^class udpServer{$/;"	c
 userInfo	userManager.hpp	/^class userInfo{$/;"	c
 userLogin	userManager.hpp	/^  int userLogin(loginRequest& lg){$/;"	f	class:userMaganer
 userLogout	userManager.hpp	/^  int userLogout(logoutRequest& lr){$/;"	f	class:userMaganer
