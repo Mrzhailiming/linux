@@ -89,11 +89,9 @@ class userMaganer{
     }
     //填充姓名学校密码
     userInfo newUser;
-    LOG("INFO", "fill name school password");
     newUser.getPwd() = reg._password;
     newUser.addNameSchPwd(reg._name, reg._school, reg._password);
     newUser.getStat() = LOGINED;//更改状态为已注册
-    printf("name:%s school:%s password: %s id:%ld\n", newUser.getName().c_str(), newUser.getSchool().c_str(), newUser.getPwd().c_str(), newUser.getId());
     
     //操作临界资源_newId 和线程不安全的unordered_map
     pthread_mutex_lock(&_mt);
@@ -101,11 +99,10 @@ class userMaganer{
     userId = (*_newId)++;
     newUser.getId() = userId;
 
-    printf("name:%s school:%s password: %s id:%ld\n", reg._name,reg._school, reg._password, newUser.getId());
+    printf("新用户信息->>name:%s school:%s password: %s id:%ld stat: %d\n", newUser.getName().c_str(), newUser.getSchool().c_str(), newUser.getPwd().c_str(), newUser.getId(), newUser.getStat());
     //放入用户池
     _usersMap.insert(std::make_pair(userId, newUser));
     pthread_mutex_unlock(&_mt);
-    printf("Register deal success, ID: %ld status : %d FILE : %s LINE %d\n", userId, newUser.getStat(), __FILE__, __LINE__);
     return REGIST_SUCCESS;
   }
 
@@ -122,9 +119,9 @@ class userMaganer{
       pthread_mutex_unlock(&_mt);
       return LOGIN_FAILED;
     }
-    //更改状态为ONLINE
+    //更改状态为LOGINED
     it->second.getStat() = LOGINED;
-    _usersOnline.push_back(it->second);
+    //此时不添加用户到在线列表,因为没有用户的地址信息
     pthread_mutex_unlock(&_mt);
     LOG("INFO", "user login success");
     return LOGIN_SUCCESS;
@@ -142,9 +139,8 @@ class userMaganer{
     return LOGOUT_FAILED;
   }
 
-  //填充用户地址信息,成功返回0,失败返回-1
+  //填充用户地址信息,成功返回0,失败返回--1 用户已经在线则返回ONLINE
   int addAddrPort(const uint64_t userId, const sockaddr_in& addr, socklen_t len){
-
     //保证线程安全
     pthread_mutex_lock(&_mt);
     std::unordered_map<uint64_t, userInfo>::iterator it = _usersMap.find(userId);
@@ -154,15 +150,17 @@ class userMaganer{
       LOG("WARNING", "user not found");
       return -1;
     }
-    //用户如果在线,就不用填充地址信息,
+    //用户如果在线,就不用填充地址信息,在线:定义为发过一条消息
     if(it->second.getStat() == ONLINE){
       pthread_mutex_unlock(&_mt);
-      return 0;
+      return ONLINE;
     }
-    //用户为LOGINED,则填充地址信息,并把状态改为ONLINE
+    //用户为LOGINED,没有发第一条消息,则填充地址信息,并把状态改为ONLINE
     it->second.addAddrLen(addr, len);
     it->second.getStat() = ONLINE;
 
+    //加入在线列表
+    _usersOnline.push_back(it->second);
     pthread_mutex_unlock(&_mt);
     return 0;
   }
@@ -182,6 +180,9 @@ class userMaganer{
   //get在线用户
   std::vector<userInfo>& getOnlineUser(){
     return _usersOnline;
+  }
+  int getUserNum(){
+    return _usersOnline.size();
   }
   private:
     //存放所有用户信息

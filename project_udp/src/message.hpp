@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <string>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "/usr/include/include/json/json.h"
 
@@ -13,7 +15,7 @@ class Message{
       val["_name"] = _name;
       val["_school"] = _school;
       val["_data"] = _data;
-      val["_userId"] = 0;
+      val["_userId"] = std::to_string(_userId);
       msg = val.toStyledString();
     }
 
@@ -25,7 +27,7 @@ class Message{
       _name = val["_name"].asString();
       _school = val["_school"].asString();
       _data = val["_data"].asString();
-      _userId = val["_userId"].asInt();
+      _userId = atol(val["_userId"].asString().c_str());
     }
     std::string& getName(){
       return _name;
@@ -46,11 +48,11 @@ class Message{
     void setSchool(std::string& school){
       _school = school;
     }
-    void setId(uint64_t Id){
-      _userId = Id;
-    }
     void setData(std::string& data){
       _data = data;
+    }
+    void setUserId(uint64_t id){
+      _userId = id;
     }
   private:
     std::string _name;

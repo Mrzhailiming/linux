@@ -1,4 +1,4 @@
-.PHONY:client chatServer  
+.PHONY:client chatServer
 
 
 client:client.cpp

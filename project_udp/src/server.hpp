@@ -236,7 +236,7 @@ class Server{
       char buf[1024 * 10] = {0};
       int ret = recvfrom(_sockfd, buf, sizeof(buf) - 1, 0, (struct sockaddr*)&dest, &len);
       if(ret < 0){
-        LOG("WARNING","sendto : recvMessageFromClient error");
+        LOG("WARNING","recvMessageFromClient error");
       }
       else{
         //存放数据, 使用json反序列化mesg, 得到ID等用户信息
@@ -245,16 +245,15 @@ class Server{
         //反序列化字符串
         Message json;
         json.Deser(mesg);
-        printf("接收到数据,反序列化, user: %ld, %s %s\n", json.getUserId(), json.getName().c_str(), json.getSchool().c_str());
+        printf("接收到一条数据->>> user: %ld, %s %s\n", json.getUserId(), json.getName().c_str(), json.getSchool().c_str());
         _messagePool->pushMsg(json.getData());
         //如果用户第一次发消息,则填充地址信息
-        if(_userMng->addAddrPort(json.getUserId(), dest, len) != 0){
+        int addStat = _userMng->addAddrPort(json.getUserId(), dest, len);
+        if(addStat == -1){
           LOG("ERROR", "user not found");
         }
-        else{
-          //添加用户到在线列表
-          _userMng->addOnlineUser(json.getUserId());
-          LOG("INFO", "user add online");
+        else if(addStat == ONLINE){
+          LOG("INFO", "user ONLINE dont need to add to OnlineUser");
         }
       }
     }
@@ -265,6 +264,8 @@ class Server{
       std::string data;
       _messagePool->popMsg(data);
       std::vector<userInfo> userVec = _userMng->getOnlineUser();
+      int count = 1;
+      printf("total user->>>> %d\n", _userMng->getUserNum());
       for(auto& user : userVec){
         //群发消息
         //序列化
@@ -276,7 +277,7 @@ class Server{
         //id 怎么serTODO
         std::string out;
         json.ser(out);
-        printf("---->>>>send user: %ld, %s %s\n", json.getUserId(), json.getName().c_str(), json.getSchool().c_str());
+        printf("---->>>>send no.%d userId: %ld, %s %s\n", count++, json.getUserId(), json.getName().c_str(), json.getSchool().c_str());
         sendMessageToOne(out, user.getAddr(), user.getLen());
       }
     }
@@ -286,7 +287,7 @@ class Server{
       //给一个客户端发送数据
       int ret = sendto(_sockfd, data.c_str(), data.size(), 0, (struct sockaddr*)&destAddr, destLen);
       if(ret < 0){
-        LOG("WARNING","sendto : sendMessageToOne error");
+        LOG("WARNING","sendMessageToOne failed");
         //缓存没发送的信息, 和用户
         return;
       }

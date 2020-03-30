@@ -44,7 +44,7 @@ class clientServer{
       }
       LOG("INFO", "_tcpSock create success");
       _udpSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-      if(_tcpSock < 0){
+      if(_udpSock < 0){
         LOG("ERROR", "_udpSock create failed");
         return false;
       }
@@ -67,17 +67,29 @@ class clientServer{
     bool resetTcpsock(){
       _tcpSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
       if(_tcpSock < 0){
-        LOG("ERROR", "_tcpSock create failed");
+        LOG("ERROR", "reset _tcpSock create failed");
         return false;
       }
-      LOG("INFO", "_tcpSock create success");
+      LOG("INFO", "reset _tcpSock create success");
+      //连接
+      sockaddr_in addr;
+      addr.sin_family = AF_INET;
+      addr.sin_port = htons(TCP_PORT);
+      addr.sin_addr.s_addr = inet_addr(IP.c_str());
+      int ret = connect(_tcpSock, (struct sockaddr*)&addr, sizeof(addr));
+      if(ret < 0){
+        LOG("ERROR", "reset connect failed");
+        return false;
+      }
+      LOG("INFO", "reset connect success");
       return true;
     }
     bool sendMesg(std::string& data){
       //序列化
       Message msg;
+      //设置四件套
       msg.setData(data);
-      msg.setId(_userId);
+      msg.setUserId(_userId);
       msg.setName(_name);
       msg.setSchool(_school);
       std::string out;
@@ -122,12 +134,10 @@ class clientServer{
       msg.assign(buf, ret);
       Message m;
       m.Deser(msg);
+      //出参 谁发过来的,发的什么 来自哪个学校
       data = m.getData();
       name = m.getName();
       school = m.getSchool();
-      _name = m.getName();
-      _school = m.getSchool();
-      _userId = m.getUserId();
       LOG("INFO", "udp recvMesg success");
       return true;
     }

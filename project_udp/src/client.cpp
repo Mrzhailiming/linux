@@ -105,23 +105,53 @@ bool menu(clientServer& clientSer){
   }
   return true;
 }
+
+void* recvStart(void* arg){
+  clientServer* cs = (clientServer*)arg;
+  pthread_detach(pthread_self());
+  while(1){
+    std::string name;
+    std::string school;
+    std::string rec;
+    cs->recvMesg(rec, name, school);
+    std::cout << "[" << name << " "<< "sa ] : " << rec << "[from-school : " << school << " ]" << std::endl;
+  }
+  return NULL;
+}
+
+void* sendStart(void* arg){
+  clientServer* cs = (clientServer*)arg;
+  pthread_detach(pthread_self());
+  while(1){
+    std::cout << "[--my--] : " ;
+    fflush(stdout);
+    std::string data;
+    std::cin >> data;
+    cs->sendMesg(data);
+  }
+  return NULL;
+}
 int main(){
   clientServer cs;
   cs.initServer();
   while(menu(cs) == false){
     cs.resetTcpsock();
   }
+  printf("---------登录成功---------\n");
+  //创建线程收发数据
+  pthread_t th;
+  int ret = pthread_create(&th, NULL, recvStart, (void*)&cs);
+  if(ret < 0){
+    LOG("ERROR", "create recv thread failed");
+    return 0;
+  }
+  ret = pthread_create(&th, NULL, sendStart, (void*)&cs);
+  if(ret < 0){
+    LOG("ERROR", "create recv thread failed");
+    return 0;
+  }
   while(1){
-    std::cout << "you say :" ;
-    fflush(stdout);
-    std::string data;
-    std::cin >> data;
-    cs.sendMesg(data);
-    std::string name;
-    std::string school;
-    std::string rec;
-    cs.recvMesg(rec, name, school);
-    std::cout << "[" << name << "]" << "say :" << rec << "  from-school:" << school << std::endl;
+    sleep(100);
   }
   return 0;
 }

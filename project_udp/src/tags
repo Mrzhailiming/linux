@@ -5,7 +5,7 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
 Deser	message.hpp	/^    void Deser(std::string msg){$/;"	f	class:Message
-IP	clientServer.hpp	15;"	d
+IP	clientServer.hpp	/^    std::string IP;$/;"	m	class:clientServer
 LOG	log.hpp	9;"	d
 LOGIN	request.hpp	5;"	d
 LOGINED	request.hpp	/^  LOGINED,     \/\/已经注册$/;"	e	enum:userStat
@@ -99,15 +99,18 @@ getId	userManager.hpp	/^    uint64_t& getId(){$/;"	f	class:userInfo
 getLen	userManager.hpp	/^    socklen_t& getLen(){$/;"	f	class:userInfo
 getName	clientServer.hpp	/^    std::string& getName(){$/;"	f	class:clientServer
 getName	message.hpp	/^    std::string& getName(){$/;"	f	class:Message
+getName	userManager.hpp	/^    std::string& getName(){$/;"	f	class:userInfo
 getOnlineUser	userManager.hpp	/^  std::vector<userInfo>& getOnlineUser(){$/;"	f	class:userMaganer
 getPwd	userManager.hpp	/^    std::string& getPwd(){$/;"	f	class:userInfo
 getSchool	clientServer.hpp	/^    std::string& getSchool(){$/;"	f	class:clientServer
 getSchool	message.hpp	/^    std::string& getSchool(){$/;"	f	class:Message
+getSchool	userManager.hpp	/^    std::string& getSchool(){$/;"	f	class:userInfo
 getServer	request.hpp	/^    void* getServer(){$/;"	f	class:connetInfo
-getStat	clientServer.hpp	/^    int getStat(){$/;"	f	class:clientServer
+getStat	clientServer.hpp	/^    int& getStat(){$/;"	f	class:clientServer
 getStat	userManager.hpp	/^    int& getStat(){$/;"	f	class:userInfo
 getTcpSock	request.hpp	/^    int getTcpSock(){$/;"	f	class:connetInfo
-getUserId	message.hpp	/^    uint64_t getUserId(){$/;"	f	class:Message
+getUserId	message.hpp	/^    uint64_t& getUserId(){$/;"	f	class:Message
+getUserNum	userManager.hpp	/^  int getUserNum(){$/;"	f	class:userMaganer
 initServer	clientServer.hpp	/^    bool initServer(){$/;"	f	class:clientServer
 initServer	server.hpp	/^    void initServer(){$/;"	f	class:Server
 isFull	msgPool.hpp	/^    bool isFull(){$/;"	f	class:msgPool
@@ -118,7 +121,7 @@ logout	server.hpp	/^    int logout(int tcpSock, uint64_t& userId){$/;"	f	class:S
 logoutRequest	request.hpp	/^struct logoutRequest{$/;"	s
 main	chatServer.cpp	/^int main(){$/;"	f
 main	client.cpp	/^int main(){$/;"	f
-menu	client.cpp	/^bool menu(clientServer& cs){$/;"	f
+menu	client.cpp	/^bool menu(clientServer& clientSer){$/;"	f
 msgPool	msgPool.hpp	/^    msgPool(){$/;"	f	class:msgPool
 msgPool	msgPool.hpp	/^class msgPool{$/;"	c
 popMsg	msgPool.hpp	/^    void popMsg(std::string& msg){$/;"	f	class:msgPool
@@ -131,6 +134,7 @@ recvReply	clientServer.hpp	/^    bool recvReply(replyRequest& rp){$/;"	f	class:c
 registerRequest	request.hpp	/^struct registerRequest{$/;"	s
 replyRequest	request.hpp	/^struct replyRequest{$/;"	s
 requestStart	server.hpp	/^    static void* requestStart(void* arg){$/;"	f	class:Server
+resetTcpsock	clientServer.hpp	/^    bool resetTcpsock(){$/;"	f	class:clientServer
 sendFlag	clientServer.hpp	/^    bool sendFlag(const char ch){$/;"	f	class:clientServer
 sendMesg	clientServer.hpp	/^    bool sendMesg(std::string& data){$/;"	f	class:clientServer
 sendMessageToAll	server.hpp	/^    void sendMessageToAll(){$/;"	f	class:Server
