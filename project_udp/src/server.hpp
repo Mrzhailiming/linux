@@ -245,6 +245,7 @@ class Server{
         //反序列化字符串
         Message json;
         json.Deser(mesg);
+        printf("接收到数据,反序列化, user: %ld, %s %s\n", json.getUserId(), json.getName().c_str(), json.getSchool().c_str());
         _messagePool->pushMsg(json.getData());
         //如果用户第一次发消息,则填充地址信息
         if(_userMng->addAddrPort(json.getUserId(), dest, len) != 0){
@@ -266,7 +267,17 @@ class Server{
       std::vector<userInfo> userVec = _userMng->getOnlineUser();
       for(auto& user : userVec){
         //群发消息
-        sendMessageToOne(data, user.getAddr(), user.getLen());
+        //序列化
+        Message json;
+        json.getName() = user.getName();
+        json.getSchool() = user.getSchool();
+        json.getData() = data;
+        json.getUserId() = user.getId();
+        //id 怎么serTODO
+        std::string out;
+        json.ser(out);
+        printf("---->>>>send user: %ld, %s %s\n", json.getUserId(), json.getName().c_str(), json.getSchool().c_str());
+        sendMessageToOne(out, user.getAddr(), user.getLen());
       }
     }
 
@@ -277,6 +288,7 @@ class Server{
       if(ret < 0){
         LOG("WARNING","sendto : sendMessageToOne error");
         //缓存没发送的信息, 和用户
+        return;
       }
       LOG("INFO", "sendTOone succes");
     }

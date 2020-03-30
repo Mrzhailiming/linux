@@ -77,9 +77,7 @@ bool Logout(clientServer& cs){
   return true;
 }
 
-bool menu(clientServer& cs){
-  clientServer clientSer;
-  clientSer.initServer();
+bool menu(clientServer& clientSer){
   printf("**************************\n");
   printf("***1.登录 2.登出 3.注册***\n");
   printf("**************************\n");
@@ -105,15 +103,25 @@ bool menu(clientServer& cs){
   if(clientSer.getStat() == OFFLINE){
     return false;
   }
-  cs = clientSer;
   return true;
 }
 int main(){
   clientServer cs;
+  cs.initServer();
   while(menu(cs) == false){
-    ;
+    cs.resetTcpsock();
   }
-
-  printf("xiabanle\n");
+  while(1){
+    std::cout << "you say :" ;
+    fflush(stdout);
+    std::string data;
+    std::cin >> data;
+    cs.sendMesg(data);
+    std::string name;
+    std::string school;
+    std::string rec;
+    cs.recvMesg(rec, name, school);
+    std::cout << "[" << name << "]" << "say :" << rec << "  from-school:" << school << std::endl;
+  }
   return 0;
 }

@@ -156,6 +156,7 @@ class userMaganer{
     }
     //用户如果在线,就不用填充地址信息,
     if(it->second.getStat() == ONLINE){
+      pthread_mutex_unlock(&_mt);
       return 0;
     }
     //用户为LOGINED,则填充地址信息,并把状态改为ONLINE

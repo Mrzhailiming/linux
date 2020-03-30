@@ -12,7 +12,6 @@
 
 #define TCP_PORT 1997
 #define UDP_PORT 1999
-#define IP "192.168.88.128"
 
 class clientServer{
   public:
@@ -24,6 +23,7 @@ class clientServer{
 
       _userId = -1;
       _stat = OFFLINE;
+      IP = "192.168.88.128";
     }
     ~clientServer(){
       if(_tcpSock > 0){
@@ -54,7 +54,7 @@ class clientServer{
       sockaddr_in addr;
       addr.sin_family = AF_INET;
       addr.sin_port = htons(TCP_PORT);
-      addr.sin_addr.s_addr = inet_addr(IP);
+      addr.sin_addr.s_addr = inet_addr(IP.c_str());
       int ret = connect(_tcpSock, (struct sockaddr*)&addr, sizeof(addr));
       if(ret < 0){
         LOG("ERROR", "connect failed");
@@ -64,6 +64,15 @@ class clientServer{
       return true;
     }
 
+    bool resetTcpsock(){
+      _tcpSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+      if(_tcpSock < 0){
+        LOG("ERROR", "_tcpSock create failed");
+        return false;
+      }
+      LOG("INFO", "_tcpSock create success");
+      return true;
+    }
     bool sendMesg(std::string& data){
       //序列化
       Message msg;
@@ -77,7 +86,7 @@ class clientServer{
       sockaddr_in addr;
       addr.sin_family = AF_INET;
       addr.sin_port = htons(UDP_PORT);
-      addr.sin_addr.s_addr = inet_addr(IP);
+      addr.sin_addr.s_addr = inet_addr(IP.c_str());
       int ret = sendto(_udpSock, out.c_str(), out.size(), 0, (struct sockaddr*)&addr, sizeof(addr));
       if(ret < 0){
         LOG("ERROR", "udp sendto failed");
@@ -116,6 +125,9 @@ class clientServer{
       data = m.getData();
       name = m.getName();
       school = m.getSchool();
+      _name = m.getName();
+      _school = m.getSchool();
+      _userId = m.getUserId();
       LOG("INFO", "udp recvMesg success");
       return true;
     }
@@ -124,15 +136,15 @@ class clientServer{
     bool sendRequest(int flag, uint64_t userId = -1, std::string name = "null", std::string school = "null", std::string password = "null"){
       //先发送标志
       sendFlag(flag + '0');
-      printf("send login flag success\n");
       //在发送请求信息
       switch(flag){
         case LOGIN:
+          //给id赋值
+          _userId = userId;
           loginRequest li;
           li._userId = userId;
           memset(li._password, 0, PASSWAOR_SIZE);
           memcpy(li._password, password.c_str(), password.size());
-          printf("password: %s %s %d\n", li._password, __FILE__, __LINE__);
           return _loginReq(li);
           break;
         case LOGOUT:
@@ -142,10 +154,11 @@ class clientServer{
           break;
         case REGESTER:
           registerRequest rg;
-          //在使用之前要memeset
+          //在使用之前要memeset, 初始化
           memset(rg._name, 0, NAME_SIZE);
           memset(rg._school, 0, SCHOOL_SIZE);
           memset(rg._password, 0, PASSWAOR_SIZE);
+          //cpy
           memcpy(rg._name, name.c_str(), name.size());
           memcpy(rg._school, school.c_str(), school.size());
           memcpy(rg._password, password.c_str(), password.size());
@@ -163,7 +176,7 @@ class clientServer{
       return _name;
     }
     std::string& getSchool(){
-      return _name;
+      return _school;
     }
     uint64_t& getId(){
       return _userId;
@@ -228,4 +241,5 @@ class clientServer{
     std::string _name;
     std::string _school;
     int _stat;
+    std::string IP;
 };

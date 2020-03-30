@@ -13,7 +13,7 @@ class Message{
       val["_name"] = _name;
       val["_school"] = _school;
       val["_data"] = _data;
-      val["_userId"] = 1;
+      val["_userId"] = 0;
       msg = val.toStyledString();
     }
 
@@ -25,7 +25,7 @@ class Message{
       _name = val["_name"].asString();
       _school = val["_school"].asString();
       _data = val["_data"].asString();
-      _userId = val["_password"].asInt();
+      _userId = val["_userId"].asInt();
     }
     std::string& getName(){
       return _name;
@@ -36,7 +36,7 @@ class Message{
     std::string& getData(){
       return _data;
     }
-    uint64_t getUserId(){
+    uint64_t& getUserId(){
       return _userId;
     }
     
