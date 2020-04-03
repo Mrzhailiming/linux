@@ -16,6 +16,7 @@ class Message{
       val["_school"] = _school;
       val["_data"] = _data;
       val["_userId"] = std::to_string(_userId);
+      //将json转换为string
       msg = val.toStyledString();
     }
 
@@ -23,6 +24,7 @@ class Message{
     void Deser(std::string msg){
       Json::Reader read;
       Json::Value val;
+      //将string 转换为 json
       read.parse(msg, val, false);
       _name = val["_name"].asString();
       _school = val["_school"].asString();

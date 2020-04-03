@@ -1,7 +1,19 @@
-.PHONY:client chatServer
+
+CLIENT = ./client
+SERVER = ./chatServer
+
+.PHONY:all
+	
+all:$(CLIENT) $(SERVER)
 
 
-client:client.cpp
+$(SERVER):chatServer.cpp
 	g++ -std=c++11 $^ -o $@ -lpthread -ljson
-chatServer:chatServer.cpp
+
+$(CLIENT):client.cpp
 	g++ -std=c++11 $^ -o $@ -lpthread -ljson
+
+.PHONY:clean
+
+clean:
+	rm -f ./client ./chatServer

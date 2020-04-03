@@ -24,6 +24,8 @@ class clientServer{
       _userId = -1;
       _stat = OFFLINE;
       IP = "192.168.88.128";
+      _name = "";
+      _school = "";
     }
     ~clientServer(){
       if(_tcpSock > 0){
@@ -88,11 +90,13 @@ class clientServer{
       //序列化
       Message msg;
       //设置四件套
+      //存在一个问题: 直接登录, 会得不到_school _Userid
       msg.setData(data);
       msg.setUserId(_userId);
       msg.setName(_name);
       msg.setSchool(_school);
       std::string out;
+      //序列化
       msg.ser(out);
 
       sockaddr_in addr;
@@ -138,6 +142,13 @@ class clientServer{
       data = m.getData();
       name = m.getName();
       school = m.getSchool();
+      uint64_t recvUserId = m.getUserId();
+      if(_userId == recvUserId && _name != name){
+        //如果name school还没有被赋值,,或者当前name与当前id所对应的内容不同, 则需要赋值
+        //否则客户端会一直发name school 为空的json串
+        _name = name;
+        _school = school;
+      }
       LOG("INFO", "udp recvMesg success");
       return true;
     }

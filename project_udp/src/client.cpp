@@ -100,6 +100,7 @@ bool menu(clientServer& clientSer){
       return false;
       break;
   }
+  //如果不是登录状态, 就返回false, 再次进入menu
   if(clientSer.getStat() == OFFLINE){
     return false;
   }
@@ -110,11 +111,12 @@ void* recvStart(void* arg){
   clientServer* cs = (clientServer*)arg;
   pthread_detach(pthread_self());
   while(1){
+    //存放接收到信息的name school 
     std::string name;
     std::string school;
     std::string rec;
     cs->recvMesg(rec, name, school);
-    std::cout << "[" << name << " "<< "sa ] : " << rec << "[from-school : " << school << " ]" << std::endl;
+    std::cout << "[ " << name << " ] : " << rec << " [school : " << school << " ]" << std::endl;
   }
   return NULL;
 }
@@ -122,8 +124,8 @@ void* recvStart(void* arg){
 void* sendStart(void* arg){
   clientServer* cs = (clientServer*)arg;
   pthread_detach(pthread_self());
+  std::cout << "[--my--] : " ;
   while(1){
-    std::cout << "[--my--] : " ;
     fflush(stdout);
     std::string data;
     std::cin >> data;
@@ -135,6 +137,7 @@ int main(){
   clientServer cs;
   cs.initServer();
   while(menu(cs) == false){
+    //再次进入menu时, 要重新建立一个tcp连接
     cs.resetTcpsock();
   }
   printf("---------登录成功---------\n");

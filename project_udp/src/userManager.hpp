@@ -113,7 +113,6 @@ class userMaganer{
     pthread_mutex_lock(&_mt);
     std::unordered_map<uint64_t, userInfo>::iterator it = _usersMap.find(userId);
     //没找到用户/密码不对
-    printf("log:INFO useId:%ld passwor:%s\n", userId, lg._password);
     if(it == _usersMap.end() || strcmp(it->second.getPwd().c_str(), lg._password) != 0){
       LOG("INFO", "user not found or pwd not correct");
       pthread_mutex_unlock(&_mt);
@@ -152,6 +151,7 @@ class userMaganer{
     }
     //用户如果在线,就不用填充地址信息,在线:定义为发过一条消息
     if(it->second.getStat() == ONLINE){
+      LOG("INFO", "用户已经在线");
       pthread_mutex_unlock(&_mt);
       return ONLINE;
     }
@@ -169,10 +169,18 @@ class userMaganer{
   void addOnlineUser(uint64_t userId){
     pthread_mutex_lock(&_mt);
     std::unordered_map<uint64_t, userInfo>::iterator it = _usersMap.find(userId);
+    //用户不存在
     if(it == _usersMap.end()){
       LOG("ERROR", "user not found");
     }
+    //用户存在
     else{
+      //std::vector<userInfo>::iterator onlineIt = std::find(_usersOnline.begin(), _usersOnline.end(), it->second);
+      //用户未正常退出, 不需要添加到在线列表
+      //if(onlineIt != _usersOnline.end()){
+      //  LOG("INFO", "user not logout usual and had reset the info");
+      //}
+      //else
       _usersOnline.push_back(it->second);
     }
     pthread_mutex_unlock(&_mt);
@@ -180,6 +188,9 @@ class userMaganer{
   //get在线用户
   std::vector<userInfo>& getOnlineUser(){
     return _usersOnline;
+  }
+  userInfo getUserInfo(uint64_t userId){
+    return _usersMap.find(userId)->second;
   }
   int getUserNum(){
     return _usersOnline.size();

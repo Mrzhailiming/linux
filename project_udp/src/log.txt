@@ -1,14 +1,102 @@
-log:INFO clientServer.hpp45 _tcpSock create success
-log:INFO clientServer.hpp51 _udpSock create success
-log:INFO clientServer.hpp63 connect success
-log:INFO clientServer.hpp206 send flag success
-log:INFO clientServer.hpp216 send loginRequest success
+log:INFO server.hpp44 create udpsocket success
+log:INFO server.hpp55 udp bind success
+log:INFO server.hpp89 initServer success
+log:INFO server.hpp104 sendto and recvfrom thread create success
+log:INFO clientServer.hpp47 _tcpSock create success
+log:INFO clientServer.hpp53 _udpSock create success
+log:INFO clientServer.hpp65 connect success
+log:INFO server.hpp111 a tcp had accept
+log:INFO server.hpp122 requestStart thread create success
+log:INFO clientServer.hpp217 send flag success
+log:INFO clientServer.hpp227 send loginRequest success
 log:INFO client.cpp61 sendRequest success wait recvReply
-log:INFO clientServer.hpp120 recvReply success
-log:INFO clientServer.hpp107 udp sendto success
-log:INFO clientServer.hpp141 udp recvMesg success
-log:INFO clientServer.hpp107 udp sendto success
-log:INFO clientServer.hpp141 udp recvMesg success
-log:INFO clientServer.hpp107 udp sendto success
-log:INFO clientServer.hpp141 udp recvMesg success
-log:INFO clientServer.hpp141 udp recvMesg success
+log:INFO server.hpp193 dealwith login ing
+log:INFO userManager.hpp117 user not found or pwd not correct
+log:INFO server.hpp162 reply success
+log:INFO clientServer.hpp124 recvReply success
+log:INFO clientServer.hpp75 reset _tcpSock create success
+log:INFO clientServer.hpp86 reset connect success
+log:INFO server.hpp111 a tcp had accept
+log:INFO server.hpp122 requestStart thread create success
+log:INFO clientServer.hpp217 send flag success
+log:INFO clientServer.hpp247 send registerRequest success
+log:INFO server.hpp181 dealwith Register ing
+log:INFO server.hpp162 reply success
+log:INFO clientServer.hpp124 recvReply success
+log:INFO clientServer.hpp75 reset _tcpSock create success
+log:INFO clientServer.hpp86 reset connect success
+log:INFO server.hpp111 a tcp had accept
+log:INFO server.hpp122 requestStart thread create success
+log:INFO clientServer.hpp217 send flag success
+log:INFO clientServer.hpp247 send registerRequest success
+log:INFO server.hpp181 dealwith Register ing
+log:INFO server.hpp162 reply success
+log:INFO clientServer.hpp124 recvReply success
+log:INFO clientServer.hpp75 reset _tcpSock create success
+log:INFO clientServer.hpp86 reset connect success
+log:INFO server.hpp111 a tcp had accept
+log:INFO server.hpp122 requestStart thread create success
+log:INFO clientServer.hpp217 send flag success
+log:INFO clientServer.hpp227 send loginRequest success
+log:INFO client.cpp61 sendRequest success wait recvReply
+log:INFO server.hpp193 dealwith login ing
+log:INFO userManager.hpp125 user login success
+log:INFO server.hpp162 reply success
+log:INFO clientServer.hpp124 recvReply success
+log:INFO clientServer.hpp111 udp sendto success
+log:INFO server.hpp307 sendTOone succes
+log:INFO clientServer.hpp152 udp recvMesg success
+log:INFO clientServer.hpp47 _tcpSock create success
+log:INFO clientServer.hpp53 _udpSock create success
+log:INFO clientServer.hpp65 connect success
+log:INFO server.hpp111 a tcp had accept
+log:INFO server.hpp122 requestStart thread create success
+log:INFO clientServer.hpp217 send flag success
+log:INFO clientServer.hpp227 send loginRequest success
+log:INFO client.cpp61 sendRequest success wait recvReply
+log:INFO server.hpp193 dealwith login ing
+log:INFO userManager.hpp125 user login success
+log:INFO server.hpp162 reply success
+log:INFO clientServer.hpp124 recvReply success
+log:INFO clientServer.hpp111 udp sendto success
+log:INFO server.hpp307 sendTOone succes
+log:INFO server.hpp307 sendTOone succes
+log:INFO clientServer.hpp152 udp recvMesg success
+log:INFO clientServer.hpp152 udp recvMesg success
+log:INFO clientServer.hpp47 _tcpSock create success
+log:INFO clientServer.hpp53 _udpSock create success
+log:INFO clientServer.hpp65 connect success
+log:INFO server.hpp111 a tcp had accept
+log:INFO server.hpp122 requestStart thread create success
+log:INFO clientServer.hpp217 send flag success
+log:INFO clientServer.hpp227 send loginRequest success
+log:INFO client.cpp61 sendRequest success wait recvReply
+log:INFO server.hpp193 dealwith login ing
+log:INFO userManager.hpp125 user login success
+log:INFO server.hpp162 reply success
+log:INFO clientServer.hpp124 recvReply success
+log:INFO clientServer.hpp111 udp sendto success
+log:INFO server.hpp307 sendTOone succes
+log:INFO server.hpp307 sendTOone succes
+log:INFO server.hpp307 sendTOone succes
+log:INFO clientServer.hpp152 udp recvMesg success
+log:INFO clientServer.hpp152 udp recvMesg success
+log:INFO clientServer.hpp47 _tcpSock create success
+log:INFO clientServer.hpp53 _udpSock create success
+log:INFO clientServer.hpp65 connect success
+log:INFO server.hpp111 a tcp had accept
+log:INFO server.hpp122 requestStart thread create success
+log:INFO clientServer.hpp217 send flag success
+log:INFO clientServer.hpp227 send loginRequest success
+log:INFO client.cpp61 sendRequest success wait recvReply
+log:INFO server.hpp193 dealwith login ing
+log:INFO userManager.hpp125 user login success
+log:INFO server.hpp162 reply success
+log:INFO clientServer.hpp124 recvReply success
+log:INFO clientServer.hpp111 udp sendto success
+log:INFO server.hpp307 sendTOone succes
+log:INFO server.hpp307 sendTOone succes
+log:INFO server.hpp307 sendTOone succes
+log:INFO clientServer.hpp152 udp recvMesg success
+log:INFO server.hpp307 sendTOone succes
+log:INFO clientServer.hpp152 udp recvMesg success

@@ -244,17 +244,29 @@ class Server{
         mesg.assign(buf, ret);
         //反序列化字符串
         Message json;
-        json.Deser(mesg);
-        printf("接收到一条数据->>> user: %ld, %s %s\n", json.getUserId(), json.getName().c_str(), json.getSchool().c_str());
-        _messagePool->pushMsg(json.getData());
-        //如果用户第一次发消息,则填充地址信息
+        json.Deser(mesg);//先获取data 和 userId
+
+        //在addAddrPort中判断,如果用户第一次发消息,则填充地址信息
         int addStat = _userMng->addAddrPort(json.getUserId(), dest, len);
-        if(addStat == -1){
+        if(addStat == -1){//用户不存在
           LOG("ERROR", "user not found");
         }
-        else if(addStat == ONLINE){
+        else if(addStat == ONLINE){//用户是在线状态
           LOG("INFO", "user ONLINE dont need to add to OnlineUser");
         }
+        //用户第一次发送消息, 需要从map中找到该用户并填充信息
+        else{
+          //存json串, 如果用户第一次发消息,需要填充json串里的name 和 school,
+          //因为用户是直接登录的,并没有输入这些信息, 需要给json串填充name school
+          //只需填充一次, 当客户端收到服务端群发的消息时,会填充上自己的name school,不会再发name为空的json串
+          userInfo uInfo = _userMng->getUserInfo(json.getUserId());
+          json.getName() = uInfo.getName();
+          json.getSchool() = uInfo.getSchool();
+          json.ser(mesg);//此时的mesg已经被填充上name school
+        }
+        //此时的mesg已经具有data, name, school
+        _messagePool->pushMsg(mesg);
+          printf("接收到一条数据->>> user: %ld, %s %s\n", json.getUserId(), json.getName().c_str(), json.getSchool().c_str());
       }
     }
 
@@ -269,16 +281,17 @@ class Server{
       for(auto& user : userVec){
         //群发消息
         //序列化
-        Message json;
-        json.getName() = user.getName();
-        json.getSchool() = user.getSchool();
-        json.getData() = data;
-        json.getUserId() = user.getId();
-        //id 怎么serTODO
-        std::string out;
-        json.ser(out);
-        printf("---->>>>send no.%d userId: %ld, %s %s\n", count++, json.getUserId(), json.getName().c_str(), json.getSchool().c_str());
-        sendMessageToOne(out, user.getAddr(), user.getLen());
+        //Message json;
+        //json.getName() = user.getName();
+        //json.getSchool() = user.getSchool();
+        //json.getData() = data;
+        //json.getUserId() = user.getId();
+        
+        //std::string out;
+        //json.ser(out);
+        //printf("---->>>>send no.%d userId: %ld, %s %s\n", count++, json.getUserId(), json.getName().c_str(), json.getSchool().c_str());
+        printf("给第 %d 个用户发送消息\n", count++);
+        sendMessageToOne(data, user.getAddr(), user.getLen());
       }
     }
 

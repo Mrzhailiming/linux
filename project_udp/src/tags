@@ -6,7 +6,7 @@
 !_TAG_PROGRAM_VERSION	5.8	//
 Deser	message.hpp	/^    void Deser(std::string msg){$/;"	f	class:Message
 IP	clientServer.hpp	/^    std::string IP;$/;"	m	class:clientServer
-LOG	log.hpp	9;"	d
+LOG	log.hpp	21;"	d
 LOGIN	request.hpp	5;"	d
 LOGINED	request.hpp	/^  LOGINED,     \/\/已经注册$/;"	e	enum:userStat
 LOGIN_FAILED	request.hpp	/^  LOGIN_FAILED,      \/\/登录失败$/;"	e	enum:dealResult
@@ -131,6 +131,7 @@ pushStart	server.hpp	/^    static void* pushStart(void* arg){$/;"	f	class:Server
 recvMesg	clientServer.hpp	/^    bool recvMesg(std::string& data, std::string& name, std::string& school){$/;"	f	class:clientServer
 recvMessageFromClient	server.hpp	/^    void recvMessageFromClient(){$/;"	f	class:Server
 recvReply	clientServer.hpp	/^    bool recvReply(replyRequest& rp){$/;"	f	class:clientServer
+recvStart	client.cpp	/^void* recvStart(void* arg){$/;"	f
 registerRequest	request.hpp	/^struct registerRequest{$/;"	s
 replyRequest	request.hpp	/^struct replyRequest{$/;"	s
 requestStart	server.hpp	/^    static void* requestStart(void* arg){$/;"	f	class:Server
@@ -140,12 +141,13 @@ sendMesg	clientServer.hpp	/^    bool sendMesg(std::string& data){$/;"	f	class:cl
 sendMessageToAll	server.hpp	/^    void sendMessageToAll(){$/;"	f	class:Server
 sendMessageToOne	server.hpp	/^    void sendMessageToOne(std::string& data, struct sockaddr_in& destAddr, socklen_t destLen){$/;"	f	class:Server
 sendRequest	clientServer.hpp	/^    bool sendRequest(int flag, uint64_t userId = -1, std::string name = "null", std::string school = "null", std::string password = "null"){$/;"	f	class:clientServer
+sendStart	client.cpp	/^void* sendStart(void* arg){$/;"	f
 ser	message.hpp	/^    void ser(std::string& msg){$/;"	f	class:Message
 setData	message.hpp	/^    void setData(std::string& data){$/;"	f	class:Message
 setId	clientServer.hpp	/^    void setId(uint64_t userId){$/;"	f	class:clientServer
-setId	message.hpp	/^    void setId(uint64_t Id){$/;"	f	class:Message
 setName	message.hpp	/^    void setName(std::string& name){$/;"	f	class:Message
 setSchool	message.hpp	/^    void setSchool(std::string& school){$/;"	f	class:Message
+setUserId	message.hpp	/^    void setUserId(uint64_t id){$/;"	f	class:Message
 start	server.hpp	/^    void start(){$/;"	f	class:Server
 th	server.hpp	/^    pthread_t th;$/;"	m	class:Server
 userInfo	userManager.hpp	/^class userInfo{$/;"	c
