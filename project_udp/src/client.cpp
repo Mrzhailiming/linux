@@ -7,6 +7,7 @@
 #include "server.hpp"
 #include "message.hpp"
 #include "clientServer.hpp"
+#include "chatWindow.hpp"
 
 
 #define TCP_PORT 1997
@@ -116,7 +117,7 @@ void* recvStart(void* arg){
     std::string school;
     std::string rec;
     cs->recvMesg(rec, name, school);
-    std::cout << "[ " << name << " ] : " << rec << " [school : " << school << " ]" << std::endl;
+    std::cout << "[ " << name << " ] : " << rec << "\t [school : " << school << " ]" << std::endl;
   }
   return NULL;
 }
@@ -140,19 +141,23 @@ int main(){
     //再次进入menu时, 要重新建立一个tcp连接
     cs.resetTcpsock();
   }
-  printf("---------登录成功---------\n");
-  //创建线程收发数据
-  pthread_t th;
-  int ret = pthread_create(&th, NULL, recvStart, (void*)&cs);
-  if(ret < 0){
-    LOG("ERROR", "create recv thread failed");
-    return 0;
-  }
-  ret = pthread_create(&th, NULL, sendStart, (void*)&cs);
-  if(ret < 0){
-    LOG("ERROR", "create recv thread failed");
-    return 0;
-  }
+  //printf("---------登录成功---------\n");
+  ////创建线程收发数据
+  //pthread_t th;
+  //int ret = pthread_create(&th, NULL, recvStart, (void*)&cs);
+  //if(ret < 0){
+  //  LOG("ERROR", "create recv thread failed");
+  //  return 0;
+  //}
+  //ret = pthread_create(&th, NULL, sendStart, (void*)&cs);
+  //if(ret < 0){
+  //  LOG("ERROR", "create recv thread failed");
+  //  return 0;
+  //}
+  chatWindow chWin;
+  //chWin.makeHead();
+  //chWin.makeBody();
+  chWin.startWindow(&cs);
   while(1){
     sleep(100);
   }

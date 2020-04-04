@@ -1,17 +1,22 @@
 
+TAGS = -std=c++11 -lpthread -ljson -lncurses
 CLIENT = ./client
 SERVER = ./chatServer
+WIN = ./win
 
 .PHONY:all
 	
-all:$(CLIENT) $(SERVER)
+all:$(CLIENT) $(SERVER) $(WIN)
 
 
 $(SERVER):chatServer.cpp
-	g++ -std=c++11 $^ -o $@ -lpthread -ljson
+	g++ $^ -o $@ $(TAGS)
 
 $(CLIENT):client.cpp
-	g++ -std=c++11 $^ -o $@ -lpthread -ljson
+	g++ $^ -o $@ $(TAGS)
+
+$(WIN):chatWindow.cpp 
+	g++ $^ -o $@ $(TAGS)
 
 .PHONY:clean
 

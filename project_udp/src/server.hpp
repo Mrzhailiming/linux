@@ -141,7 +141,6 @@ class Server{
       }
       uint64_t userId = -1;
       int userStat = -1;//为请求的处理结果
-      printf("INFO requestStart recv flag %c\n", flag);
       switch(flag - '0'){
         case LOGIN:
           userStat = server->login(tcpSock, userId);
