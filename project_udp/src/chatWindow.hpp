@@ -38,7 +38,7 @@ class chatWindow{
       _threadVec.clear();
       //初始化锁
       pthread_mutex_init(&_mt, NULL);
-      //刷新窗口
+      //初始化窗口
       initscr();
       //光标不可见
       curs_set(0);
@@ -70,7 +70,7 @@ class chatWindow{
       box(_head, 0, 0);
       std::string data = "welcome to chat";
       //在哪个位置打印
-        wmove(_head, line / 2, col / 2);
+        wmove(_head, line / 2, col / 2 - data.size() / 2);
         //wmove(_head, 1, 1);
         wprintw(_head, "%s", data.c_str());
         _wrefresh(_head);
@@ -102,7 +102,7 @@ class chatWindow{
         _wrefresh(_body);
         //清空窗口
         if(++nowLine == line - 1){
-          wclear(_body);
+          wclear(_body);//刷新窗口, 边框也会被刷掉
           nowLine = 1;
           box(_body, '^', '^');
         }
@@ -115,9 +115,8 @@ class chatWindow{
       int x = _maxCol * 4 / 5;
       _right = newwin(line, col, y, x);
       box(_right, '*', '+');
-
-        wmove(_right, 1, col / 2 - 4);
-        wprintw(_right, "%s", "user list");
+      wmove(_right, 1, col / 2 - 4);
+        wprintw(_right, "[%s]-[%s]","name", "school");
         _wrefresh(_right);
     }
     void makeIn(clientServer* cs){
@@ -127,6 +126,7 @@ class chatWindow{
       int x = 0;
       _in = newwin(line, col, y, x);
       box(_in, '*', '+');
+      curs_set(1);
       while(1){
         wmove(_in, 1, 1);
         wprintw(_in, "%s", "you say:");
