@@ -7,6 +7,8 @@
 
 #include "/usr/include/include/json/json.h"
 
+//对于信息的发送,需要序列化
+//对于接收到的信息,要反序列化
 class Message{
   public:
     //序列化, 把json格式转换为字符串
@@ -16,7 +18,7 @@ class Message{
       val["_school"] = _school;
       val["_data"] = _data;
       val["_userId"] = std::to_string(_userId);
-      //将json转换为string
+      //将json串转换为string
       msg = val.toStyledString();
     }
 
