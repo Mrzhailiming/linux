@@ -1,3 +1,4 @@
 all:out
 
-gcc
+out:net.cpp
+	g++ $^ -o $@
