@@ -1,3 +1,6 @@
 int main(){
-return 0;
+	int abc = 1;
+	int aaa = 1;
+	dada
+	return 0;
 }
