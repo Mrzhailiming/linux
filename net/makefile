@@ -1,4 +1,4 @@
 all:out
 
-out:net.cpp
-	g++ $^ -o $@
+out:test.cpp
+	g++ $^ -o $@ -std=c++11
